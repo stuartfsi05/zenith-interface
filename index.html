@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenith | Prompt Architect Engine</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body>
+  <div id="app">
+    <!-- Login View -->
+    <div id="login-view" class="view active">
+      <div class="login-container">
+        <div class="brand">
+          <div class="logo-placeholder">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="36" height="36" fill="none">
+              <!-- Z Shape: Node/Network path -->
+              <path d="M25 30 L75 30 L30 70 L80 70" stroke="white" stroke-width="12" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h1>Zenith | O Arquiteto de Prompts</h1>
+          <p>Analisa, otimiza e refina seus prompts para máxima qualidade, clareza e segurança. Zenith atua como seu
+            especialista em engenharia de prompt, aplicando um processo estruturado para transformar ideias em
+            instruções de IA de nível profissional. Use-o para: criar prompts complexos do zero, depurar falhas em
+            prompts existentes e aprender as melhores práticas de interação com IA.</p>
+        </div>
+        <form id="login-form">
+          <div class="input-group">
+            <input type="email" id="email" name="email" required placeholder="Email corporativo" autocomplete="email">
+          </div>
+          <div class="input-group">
+            <input type="password" id="password" name="password" required placeholder="Senha de acesso"
+              autocomplete="current-password">
+          </div>
+          <button type="submit" id="login-btn">
+            <span class="btn-text">Entrar</span>
+            <div class="spinner hidden"></div>
+          </button>
+          <div id="login-error" class="error-msg hidden">Credenciais inválidas. Tente novamente.</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Chat View (Gemini Style) -->
+    <div id="chat-view" class="view hidden">
+      <div class="chat-container">
+
+        <!-- Sidebar Layout -->
+        <aside id="sidebar" class="sidebar">
+          <div class="sidebar-top">
+            <button id="toggle-sidebar" class="icon-btn" title="Recolher menu" aria-label="Recolher menu lateral" aria-expanded="true" tabindex="0">
+              <i data-feather="menu"></i>
+            </button>
+            <button id="new-chat-btn" class="sidebar-action-btn primary-action" aria-label="Iniciar novo chat" tabindex="0">
+              <i data-feather="plus"></i>
+              <span class="btn-text">Novo Chat</span>
+            </button>
+          </div>
+
+          <div class="sidebar-middle">
+            <h3 class="sidebar-section-title">Recentes</h3>
+            <ul class="chat-history-list" aria-label="Histórico de Chats">
+              <li class="history-item active" role="button" tabindex="0" aria-label="Abrir chat Refinamento de Prompts">
+                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Refinamento de Prompts...</span>
+                <div class="item-actions">
+                  <button class="action-icon" title="Opções" aria-label="Opções do chat"><i data-feather="more-horizontal"></i></button>
+                </div>
+              </li>
+              <li class="history-item" role="button" tabindex="0" aria-label="Abrir chat Análise de Dados Q3">
+                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Análise de Dados Q3</span>
+                <div class="item-actions">
+                  <button class="action-icon" title="Opções" aria-label="Opções do chat"><i data-feather="more-horizontal"></i></button>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="sidebar-bottom">
+            <ul class="settings-list" aria-label="Configurações e Ajuda">
+              <li class="settings-item" role="button" tabindex="0">
+                <i data-feather="help-circle" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Ajuda / FAQ</span>
+              </li>
+              <li class="settings-item" role="button" tabindex="0">
+                <i data-feather="activity" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Atividade</span>
+              </li>
+              <li class="settings-item" role="button" tabindex="0">
+                <i data-feather="settings" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Configurações</span>
+              </li>
+              <li class="settings-item" role="button" tabindex="0">
+                <i data-feather="link" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Links Públicos</span>
+              </li>
+              <li class="settings-item" id="theme-toggle-btn" role="button" tabindex="0">
+                <i data-feather="sun" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Tema Claro/Escuro</span>
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <div class="main-workspace">
+          <!-- Top Navigation -->
+          <header class="top-nav">
+            <div class="nav-left">
+              <!-- Sidebar toggle moved inside sidebar itself for internal open state, and also kept out here when closed initially or depending on logic -->
+              <button id="open-sidebar-btn" class="icon-btn" title="Menu principal" aria-label="Expandir menu lateral" aria-expanded="false" tabindex="0">
+                <i data-feather="menu"></i>
+              </button>
+              <div class="app-title">
+                <div class="mini-logo">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16" fill="none">
+                    <path d="M25 30 L75 30 L30 70 L80 70" stroke="white" stroke-width="12" stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <span class="logo-text">Zenith</span>
+                <span class="version-badge">PRO</span>
+              </div>
+            </div>
+            <div class="nav-center">
+              <button class="model-selector">
+                Zenith Engine (Transient) <i data-feather="chevron-down"></i>
+              </button>
+            </div>
+            <div class="nav-right">
+              <button id="logout-btn" class="icon-btn tooltip-container" title="Encerrar Sessão">
+                <i data-feather="log-out"></i>
+              </button>
+              <div class="user-avatar" id="user-display">U</div>
+            </div>
+          </header>
+
+          <!-- Main Centered Content -->
+          <main class="chat-main">
+
+            <div id="chat-history" class="chat-history">
+              <!-- Initial Greeting -->
+              <div class="message system-message fade-in-up">
+                <div class="message-avatar system-avatar">Z</div>
+                <div class="message-content">
+                  <p>Bem-vindo ao Zenith. O Roteador Cognitivo está online. O que construiremos hoje?</p>
+                </div>
+              </div>
+              <!-- Messages will be injected here -->
+            </div>
+
+            <!-- Bottom Input Area -->
+            <div class="input-container-wrapper">
+              <form id="chat-form">
+                <div class="chat-input-box">
+                  <textarea id="chat-input" placeholder="Digite seu prompt ao Zenith..." rows="1"></textarea>
+                  <div class="input-actions">
+                    <button type="submit" id="send-btn" class="send-btn" disabled>
+                      <i data-feather="arrow-up"></i>
+                    </button>
+                  </div>
+                </div>
+              </form>
+              <div class="disclaimer">
+                O Zenith processa dados cognitivamente. O uso das respostas requer revisão humana (The Judge).
+              </div>
+            </div>
+
+          </main>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
