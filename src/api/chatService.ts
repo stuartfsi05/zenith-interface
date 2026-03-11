@@ -1,5 +1,5 @@
-import { config } from './config';
-import { StorageManager } from './storage';
+import { config } from '../core/config';
+import { StorageManager } from '../core/storage';
 
 export const ApiModule = {
   sendChatStream: async (

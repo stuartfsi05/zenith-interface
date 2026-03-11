@@ -1,0 +1,183 @@
+:root {
+  /* Minimalist Dark Theme (Gemini-inspired) */
+  --bg-color: #131314;
+  --surface-color: #1e1f20;
+  --surface-hover: #282a2c;
+  --text-primary: #e3e3e3;
+  --text-secondary: #c4c7c5;
+  --text-muted: #8e918f;
+  --border-color: #444746;
+  --primary-color: #a8c7fa;
+  /* Light blue accent */
+  --primary-hover: #d3e3fd;
+  --bubble-bg: #282a2c;
+  --error-color: #f2b8b5;
+
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition-fast: 0.1s ease-in-out;
+  --transition-normal: 0.2s cubic-bezier(0.2, 0, 0, 1);
+  --max-content-width: 800px;
+}
+
+:root[data-theme="light"] {
+  --bg-color: #ffffff;
+  --surface-color: #f8f9fa;
+  --surface-hover: #e9ecef;
+  --text-primary: #1f1f1f;
+  --text-secondary: #444746;
+  --text-muted: #747775;
+  --border-color: #d3d3d3;
+  --primary-color: #0b57d0;
+  --primary-hover: #0842a0;
+  --bubble-bg: #f0f4f9;
+  --error-color: #b3261e;
+}
+
+
+
+:root[data-theme="light"] .message-content h1, 
+:root[data-theme="light"] .message-content h2, 
+:root[data-theme="light"] .message-content h3, 
+:root[data-theme="light"] .message-content h4,
+:root[data-theme="light"] .message-content strong {
+  color: #1f1f1f;
+}
+
+:root[data-theme="light"] .message-content pre {
+  background: #f8f9fa;
+  border-color: #d3d3d3;
+}
+
+:root[data-theme="light"] .message-content pre code {
+  color: #1f1f1f;
+}
+
+:root[data-theme="light"] .message-content code {
+  color: #1f1f1f;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:root[data-theme="light"] button[type="submit"] {
+  color: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Global Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 8px; /* Fina, mas não impossível de clicar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Trilho invisível */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1); /* Branca bem transparente */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Um pouco mais visível no hover */
+}
+
+/* Utilities */
+#app {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.6; box-shadow: 0 0 0 0 rgba(168, 199, 250, 0.4); }
+  50% { opacity: 1; box-shadow: 0 0 10px 2px rgba(168, 199, 250, 0.2); }
+  100% { opacity: 0.6; box-shadow: 0 0 0 0 rgba(168, 199, 250, 0.4); }
+}
+
+.thinking-pulse {
+  animation: pulseGlow 2s infinite ease-in-out;
+  pointer-events: none;
+  background: var(--surface-hover) !important;
+  color: var(--primary-color) !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.view {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tooltip-container {
+  position: relative;
+}
+
+/* Feather Icons */
+.feather {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2px;
+}
+
+/* Icon Button */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.4s var(--transition-normal) forwards;
+}

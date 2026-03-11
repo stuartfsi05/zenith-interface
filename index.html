@@ -22,10 +22,19 @@
       <div class="login-container">
         <div class="brand">
           <div class="logo-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="36" height="36" fill="none">
-              <!-- Z Shape: Node/Network path -->
-              <path d="M25 30 L75 30 L30 70 L80 70" stroke="white" stroke-width="12" stroke-linecap="round"
-                stroke-linejoin="round" />
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+              <!-- Ascending Peak / Architect Chevron -->
+              <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-lg)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-lg)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+              <!-- Zenith Spark / Node -->
+              <circle cx="50" cy="12" r="6" fill="#14b8a6" /> <!-- Teal accent -->
+              <defs>
+                <linearGradient id="zenith-glow-lg" x1="0%" y1="100%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#4f46e5" /> <!-- Indigo -->
+                  <stop offset="50%" stop-color="#8b5cf6" /> <!-- Violet -->
+                  <stop offset="100%" stop-color="#67e8f9" /> <!-- Cyan highlighting -->
+                </linearGradient>
+              </defs>
             </svg>
           </div>
           <h1>Zenith | O Arquiteto de Prompts</h1>
@@ -36,11 +45,14 @@
         </div>
         <form id="login-form">
           <div class="input-group">
-            <input type="email" id="email" name="email" required placeholder="Email corporativo" autocomplete="email">
+            <input type="email" id="email" name="email" required placeholder="Email" autocomplete="email">
           </div>
-          <div class="input-group">
-            <input type="password" id="password" name="password" required placeholder="Senha de acesso"
+          <div class="input-group" style="position: relative;">
+            <input type="password" id="password" name="password" required placeholder="Senha"
               autocomplete="current-password">
+            <button type="button" id="toggle-password" class="toggle-password-btn" aria-label="Mostrar senha">
+              <i data-feather="eye"></i>
+            </button>
           </div>
           <button type="submit" id="login-btn">
             <span class="btn-text">Entrar</span>
@@ -58,9 +70,6 @@
         <!-- Sidebar Layout -->
         <aside id="sidebar" class="sidebar">
           <div class="sidebar-top">
-            <button id="toggle-sidebar" class="icon-btn" title="Recolher menu" aria-label="Recolher menu lateral" aria-expanded="true" tabindex="0">
-              <i data-feather="menu"></i>
-            </button>
             <button id="new-chat-btn" class="sidebar-action-btn primary-action" aria-label="Iniciar novo chat" tabindex="0">
               <i data-feather="plus"></i>
               <span class="btn-text">Novo Chat</span>
@@ -69,45 +78,17 @@
 
           <div class="sidebar-middle">
             <h3 class="sidebar-section-title">Recentes</h3>
+            <div id="empty-history-message" class="empty-history-text">Nenhuma conversa recente</div>
             <ul class="chat-history-list" aria-label="Histórico de Chats">
-              <li class="history-item active" role="button" tabindex="0" aria-label="Abrir chat Refinamento de Prompts">
-                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Refinamento de Prompts...</span>
-                <div class="item-actions">
-                  <button class="action-icon" title="Opções" aria-label="Opções do chat"><i data-feather="more-horizontal"></i></button>
-                </div>
-              </li>
-              <li class="history-item" role="button" tabindex="0" aria-label="Abrir chat Análise de Dados Q3">
-                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Análise de Dados Q3</span>
-                <div class="item-actions">
-                  <button class="action-icon" title="Opções" aria-label="Opções do chat"><i data-feather="more-horizontal"></i></button>
-                </div>
-              </li>
+              <!-- O histórico será populado dinamicamente -->
             </ul>
           </div>
 
           <div class="sidebar-bottom">
             <ul class="settings-list" aria-label="Configurações e Ajuda">
               <li class="settings-item" role="button" tabindex="0">
-                <i data-feather="help-circle" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Ajuda / FAQ</span>
-              </li>
-              <li class="settings-item" role="button" tabindex="0">
-                <i data-feather="activity" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Atividade</span>
-              </li>
-              <li class="settings-item" role="button" tabindex="0">
                 <i data-feather="settings" class="item-icon" aria-hidden="true"></i>
                 <span class="item-title">Configurações</span>
-              </li>
-              <li class="settings-item" role="button" tabindex="0">
-                <i data-feather="link" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Links Públicos</span>
-              </li>
-              <li class="settings-item" id="theme-toggle-btn" role="button" tabindex="0">
-                <i data-feather="sun" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Tema Claro/Escuro</span>
               </li>
             </ul>
           </div>
@@ -123,38 +104,72 @@
                 <i data-feather="menu"></i>
               </button>
               <div class="app-title">
-                <div class="mini-logo">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16" fill="none">
-                    <path d="M25 30 L75 30 L30 70 L80 70" stroke="white" stroke-width="12" stroke-linecap="round"
-                      stroke-linejoin="round" />
-                  </svg>
-                </div>
                 <span class="logo-text">Zenith</span>
-                <span class="version-badge">PRO</span>
               </div>
             </div>
-            <div class="nav-center">
-              <button class="model-selector">
-                Zenith Engine (Transient) <i data-feather="chevron-down"></i>
+            <div class="nav-center" id="nav-center" style="position: relative; display: none; justify-content: center;">
+              <button class="model-selector" id="header-model-selector" aria-label="Opções do chat atual">
+                <span>Zenith Engine (Transient)</span> <i data-feather="chevron-down"></i>
               </button>
+              <div class="history-dropdown header-dropdown" id="header-chat-dropdown">
+                <button class="dropdown-item action-pin" id="header-action-pin"><i data-feather="map-pin"></i> Fixar</button>
+                <button class="dropdown-item action-rename" id="header-action-rename"><i data-feather="edit-2"></i> Renomear</button>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item action-delete danger" id="header-action-delete"><i data-feather="trash-2"></i> Excluir</button>
+              </div>
             </div>
             <div class="nav-right">
+              <button id="theme-toggle-btn" class="icon-btn tooltip-container" title="Alternar tema">
+                <i data-feather="sun" id="theme-icon"></i>
+              </button>
               <button id="logout-btn" class="icon-btn tooltip-container" title="Encerrar Sessão">
                 <i data-feather="log-out"></i>
               </button>
-              <div class="user-avatar" id="user-display">U</div>
+              <div class="user-avatar" id="user-display"><i data-feather="user"></i></div>
             </div>
           </header>
 
           <!-- Main Centered Content -->
           <main class="chat-main">
 
-            <div id="chat-history" class="chat-history">
-              <!-- Initial Greeting -->
-              <div class="message system-message fade-in-up">
-                <div class="message-avatar system-avatar">Z</div>
-                <div class="message-content">
-                  <p>Bem-vindo ao Zenith. O Roteador Cognitivo está online. O que construiremos hoje?</p>
+            <div id="chat-history" class="chat-history empty-mode">
+              <!-- Welcome State -->
+              <div id="welcome-state" class="welcome-container fade-in-up">
+                <div class="welcome-hero">
+                  <div class="welcome-logo">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
+                      <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-hero)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-hero)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
+                      <circle cx="50" cy="12" r="6" fill="#14b8a6" />
+                      <defs>
+                        <linearGradient id="zenith-glow-hero" x1="0%" y1="100%" x2="100%" y2="0%">
+                          <stop offset="0%" stop-color="#4f46e5" />
+                          <stop offset="50%" stop-color="#8b5cf6" />
+                          <stop offset="100%" stop-color="#67e8f9" />
+                        </linearGradient>
+                      </defs>
+                    </svg>                  
+                  </div>
+                  <h1 class="welcome-title">Olá.</h1>
+                  <p class="welcome-subtitle">O que vamos projetar hoje?</p>
+                </div>
+                <div class="empty-state-suggestions">
+                  <button class="suggestion-card" data-prompt="Quero criar um mega-prompt para estruturar um plano de negócios completo. Quais são os blocos essenciais que devo incluir no prompt?">
+                    <i data-feather="layers"></i>
+                    <span>Estruturar Mega-Prompt</span>
+                  </button>
+                  <button class="suggestion-card" data-prompt="Me ajude a definir uma persona especialista em engenharia de software sênior. O prompt deve fazê-lo focar em performance e arquitetura limpa.">
+                    <i data-feather="users"></i>
+                    <span>Criar Persona Especialista</span>
+                  </button>
+                  <button class="suggestion-card" data-prompt="Tenho um script em Python antigo. Quero um prompt que não apenas refatore o código, mas explique as decisões arquiteturais tomadas.">
+                    <i data-feather="terminal"></i>
+                    <span>Converter Lógica em Prompt</span>
+                  </button>
+                  <button class="suggestion-card" data-prompt="Estou analisando dados de vendas. Como estruturo um prompt para extrair um framework de análise e tirar os melhores insights do modelo?">
+                    <i data-feather="grid"></i>
+                    <span>Extrair Framework de Análise</span>
+                  </button>
                 </div>
               </div>
               <!-- Messages will be injected here -->
@@ -164,7 +179,7 @@
             <div class="input-container-wrapper">
               <form id="chat-form">
                 <div class="chat-input-box">
-                  <textarea id="chat-input" placeholder="Digite seu prompt ao Zenith..." rows="1"></textarea>
+                  <textarea id="chat-input" placeholder="Peça ao Zenith" rows="1"></textarea>
                   <div class="input-actions">
                     <button type="submit" id="send-btn" class="send-btn" disabled>
                       <i data-feather="arrow-up"></i>
@@ -173,7 +188,7 @@
                 </div>
               </form>
               <div class="disclaimer">
-                O Zenith processa dados cognitivamente. O uso das respostas requer revisão humana (The Judge).
+                O Zenith projeta arquiteturas cognitivas e prompts estruturados. Toda lógica gerada requer validação direcional humana.
               </div>
             </div>
 

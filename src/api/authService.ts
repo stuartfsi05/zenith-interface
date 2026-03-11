@@ -1,5 +1,5 @@
-import { config } from './config';
-import { StorageManager, type User } from './storage';
+import { config } from '../core/config';
+import { StorageManager, type User } from '../core/storage';
 
 interface TokenResponse {
   access_token: string;
