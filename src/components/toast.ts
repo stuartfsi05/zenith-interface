@@ -6,7 +6,7 @@ export const Toast = {
     toast.style.position = 'fixed';
     toast.style.bottom = '20px';
     toast.style.right = '20px';
-    toast.style.backgroundColor = type === 'error' ? 'var(--error)' : 'var(--surface-color)';
+    toast.style.backgroundColor = type === 'error' ? 'var(--error-color)' : 'var(--surface-color)';
     toast.style.color = type === 'error' ? 'white' : 'var(--text-primary)';
     toast.style.padding = '12px 24px';
     toast.style.borderRadius = '8px';

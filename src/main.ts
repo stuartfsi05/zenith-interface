@@ -1,4 +1,5 @@
 import './style.css';
+import feather from 'feather-icons';
 import { AuthModule } from './api/authService';
 import { ApiModule } from './api/chatService';
 import { UI } from './ui';
@@ -10,22 +11,34 @@ import { ChatWindowComponent } from './components/chat/ChatWindow';
 import { SidebarComponent } from './components/layout/Sidebar';
 import { HeaderComponent } from './components/layout/Header';
 import { Toast } from './components/toast';
-import feather from 'feather-icons';
 
-let chatInputComponent: ChatInputComponent | null = null;
+/**
+ * Zenith Frontend Entry Point
+ * 
+ * Orchestrates the lifecycle of the application, including authentication,
+ * component initialization, and global event coordination.
+ */
 
-function initializeChatComponents() {
-  if (!chatInputComponent) {
-    chatInputComponent = new ChatInputComponent();
-    new ChatWindowComponent();
-    new SidebarComponent();
-    new HeaderComponent();
+let isChatInitialized = false;
 
-    // Wire Chat submission to Engine API
-    events.subscribe(EVENTS.MESSAGE_SENT, async (message: string) => {
-      let isFirstChunk = true;
-      let accumulatedText = "";
-      
+/**
+ * Initializes visual components andWires core engine events.
+ */
+function initializeComponents(): void {
+  if (isChatInitialized) return;
+
+  // Instantiate layout and functional components
+  new ChatInputComponent();
+  new ChatWindowComponent();
+  new SidebarComponent();
+  new HeaderComponent();
+
+  // Wire Chat Message Stream: Connects UI events to API Service
+  events.subscribe(EVENTS.MESSAGE_SENT, async (message: string) => {
+    let isFirstChunk = true;
+    let accumulatedText = "";
+
+    try {
       await ApiModule.sendChatStream(
         message,
         StorageManager.getSessionId(),
@@ -34,7 +47,7 @@ function initializeChatComponents() {
           events.emit(EVENTS.CHUNK_RECEIVED, { isFirst: isFirstChunk, accumulatedText });
           isFirstChunk = false;
         },
-        (errorMsg: string) => {
+        async (errorMsg: string) => {
           if (errorMsg === 'UNAUTHORIZED') {
             Toast.show('Sessão expirada. Redirecionando...', 'error');
             AuthModule.logout();
@@ -45,71 +58,89 @@ function initializeChatComponents() {
             Toast.show('Erro de comunicação com o motor.', 'error');
           }
         },
-        () => {}
+        () => {
+          // Stream Complete handled in child components
+        }
       );
+    } catch (err) {
+      console.error('Fatal Stream Error:', err);
+      Toast.show('Erro crítico na transmissão.', 'error');
+    }
+  });
+
+  isChatInitialized = true;
+}
+
+/**
+ * Global Event Setup
+ */
+function setupGlobalListeners(): void {
+  // Handle Login Submission
+  UI.loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = UI.loginEmailInput.value;
+    const password = UI.loginPasswordInput.value;
+
+    UI.setLoginLoading(true);
+
+    try {
+      await AuthModule.login(email, password);
+      UI.showChatView();
+      initializeComponents();
+      Toast.show('Autenticado com sucesso', 'success');
+    } catch (err) {
+      console.error('Auth failure:', err);
+      UI.showLoginError();
+    } finally {
+      UI.setLoginLoading(false);
+    }
+  });
+
+  // Handle Logout
+  UI.logoutBtn.addEventListener('click', () => {
+    AuthModule.logout();
+    UI.showLoginView();
+    Toast.show('Sessão encerrada', 'info');
+  });
+
+  // Password Visibility Toggle
+  const togglePasswordBtn = document.getElementById('toggle-password');
+  if (togglePasswordBtn) {
+    togglePasswordBtn.addEventListener('click', () => {
+      const passwordInput = document.getElementById('password') as HTMLInputElement;
+      if (passwordInput) {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+
+        const icon = togglePasswordBtn.querySelector('i');
+        if (icon) {
+          icon.setAttribute('data-feather', isPassword ? 'eye-off' : 'eye');
+          feather.replace();
+        }
+      }
     });
   }
 }
 
-// Initialize Icons
-feather.replace();
+/**
+ * Application Bootstrapper
+ */
+function boot(): void {
+  // 1. Setup Listeners
+  setupGlobalListeners();
 
-// Pre-flight check & Initialization
-function init() {
+  // 2. Perform Session Pre-flight
   if (AuthModule.isAuthenticated()) {
     UI.showChatView();
-    initializeChatComponents();
+    initializeComponents();
+  } else {
+    UI.showLoginView();
   }
+
+  // 3. Render Icons
+  feather.replace();
 }
 
-// Event Listeners: Login
-UI.loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  const email = UI.loginEmailInput.value;
-  const password = UI.loginPasswordInput.value;
+// Start application
+boot();
 
-  UI.setLoginLoading(true);
-
-  try {
-    await AuthModule.login(email, password);
-    UI.showChatView();
-    initializeChatComponents();
-    Toast.show('Autenticado com sucesso', 'success');
-  } catch (err) {
-    console.error(err);
-    UI.showLoginError();
-  } finally {
-    UI.setLoginLoading(false);
-  }
-});
-
-// Event Listeners: Logout
-UI.logoutBtn.addEventListener('click', () => {
-  AuthModule.logout();
-  UI.showLoginView();
-  Toast.show('Sessão encerrada', 'info');
-});
-
-// Event Listeners: Password Toggle
-const togglePasswordBtn = document.getElementById('toggle-password');
-if (togglePasswordBtn) {
-  togglePasswordBtn.addEventListener('click', () => {
-    const passwordInput = document.getElementById('password') as HTMLInputElement;
-    if (passwordInput) {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-      
-      const icon = togglePasswordBtn.querySelector('i');
-      if (icon) {
-        icon.setAttribute('data-feather', type === 'password' ? 'eye' : 'eye-off');
-        feather.replace();
-      }
-    }
-  });
-}
-
-// Sidebar, Header, History and Theme logic have been componentized into SidebarComponent and HeaderComponent
-
-// Star init logic moved to bottom
-init();
