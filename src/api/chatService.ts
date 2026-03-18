@@ -78,5 +78,24 @@ export const ApiModule = {
         onError(err.message === "UNAUTHORIZED" ? "UNAUTHORIZED" : "Erro de Conexão: Não foi possível alcançar o Motor Zenith.");
         onFinish();
     }
+  },
+  
+  sendFeedback: async (message: string) => {
+    const token = StorageManager.getToken();
+    const response = await fetch(`${config.apiBaseUrl}/feedback`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ message })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) throw new Error("UNAUTHORIZED");
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return await response.json();
   }
 }

@@ -53,12 +53,61 @@ export class SidebarComponent {
       }
     });
 
-    // Event Listeners: Settings
+    // Event Listeners: Settings and Feedback
     this.settingsItems.forEach(setting => {
       setting.addEventListener('click', (e) => {
         const title = (e.currentTarget as HTMLElement).querySelector('.item-title')?.textContent;
-        Toast.show(`⚡ Módulo: ${title} em fase de integração.`, "info");
+        if (title === 'Feedback') {
+          UI.feedbackModal.classList.remove('hidden');
+          UI.feedbackInput.value = '';
+          UI.feedbackInput.focus();
+        } else {
+          Toast.show(`⚡ Módulo: ${title} em fase de integração.`, "info");
+        }
       });
+    });
+
+    // Event Listeners: Feedback Modal specific
+    UI.closeFeedbackBtn.addEventListener('click', () => {
+      UI.feedbackModal.classList.add('hidden');
+    });
+
+    UI.feedbackModal.addEventListener('click', (e) => {
+      if (e.target === UI.feedbackModal) {
+        UI.feedbackModal.classList.add('hidden');
+      }
+    });
+
+    UI.submitFeedbackBtn.addEventListener('click', async () => {
+      const feedbackText = UI.feedbackInput.value.trim();
+      if (!feedbackText) {
+        Toast.show("Por favor, digite seu feedback.", "error");
+        return;
+      }
+
+      try {
+        const btnText = UI.submitFeedbackBtn.querySelector('.btn-text');
+        const spinner = UI.submitFeedbackBtn.querySelector('.spinner');
+        
+        if (btnText) btnText.classList.add('hidden');
+        if (spinner) spinner.classList.remove('hidden');
+        UI.submitFeedbackBtn.disabled = true;
+
+        const { ApiModule } = await import('../../api/chatService');
+        await ApiModule.sendFeedback(feedbackText);
+        
+        UI.feedbackModal.classList.add('hidden');
+        Toast.show("Feedback enviado com sucesso! Obrigado.", "success");
+      } catch (err: any) {
+        Toast.show("Erro ao enviar feedback. Tente novamente.", "error");
+      } finally {
+        const btnText = UI.submitFeedbackBtn.querySelector('.btn-text');
+        const spinner = UI.submitFeedbackBtn.querySelector('.spinner');
+        
+        if (btnText) btnText.classList.remove('hidden');
+        if (spinner) spinner.classList.add('hidden');
+        UI.submitFeedbackBtn.disabled = false;
+      }
     });
 
     // Global click to close all dropdowns

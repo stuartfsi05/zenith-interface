@@ -41,6 +41,11 @@ export const UI = {
   openSidebarBtn: document.getElementById('open-sidebar-btn')!,
   newChatBtn: document.getElementById('new-chat-btn')!,
   themeToggleBtn: document.getElementById('theme-toggle-btn')!,
+  feedbackBtn: document.getElementById('feedback-sidebar-btn')!,
+  feedbackModal: document.getElementById('feedback-modal')!,
+  closeFeedbackBtn: document.getElementById('close-feedback-btn')!,
+  submitFeedbackBtn: document.getElementById('submit-feedback-btn') as HTMLButtonElement,
+  feedbackInput: document.getElementById('feedback-input') as HTMLTextAreaElement,
 
   // --- View State Management ---
 
@@ -131,24 +136,6 @@ export const UI = {
           <div class="welcome-logo">${ZENITH_LOGO_SVG}</div>
           <h1 class="welcome-title">Olá.</h1>
           <p class="welcome-subtitle">O que vamos projetar hoje?</p>
-        </div>
-        <div class="empty-state-suggestions">
-          <button class="suggestion-card" data-prompt="Quero criar um mega-prompt para estruturar um plano de negócios completo.">
-            <i data-feather="layers"></i>
-            <span>Estruturar Mega-Prompt</span>
-          </button>
-          <button class="suggestion-card" data-prompt="Me ajude a definir uma persona especialista em engenharia de software sênior.">
-            <i data-feather="users"></i>
-            <span>Criar Persona Especialista</span>
-          </button>
-          <button class="suggestion-card" data-prompt="Tenho um script em Python antigo. Quero um prompt que explique decisões arquiteturais.">
-            <i data-feather="terminal"></i>
-            <span>Converter Lógica em Prompt</span>
-          </button>
-          <button class="suggestion-card" data-prompt="Estou analisando dados de vendas. Como estruturo um prompt para extrair insights?">
-            <i data-feather="grid"></i>
-            <span>Extrair Framework de Análise</span>
-          </button>
         </div>
       </div>
     `;

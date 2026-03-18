@@ -159,13 +159,17 @@
 
 /* Magic classes to center everything vertically on new chats */
 .chat-history.empty-mode {
-  flex: 0 1 auto;
-  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  height: 100%;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 
 .chat-history.empty-mode + .input-container-wrapper {
-  margin-bottom: auto;
+  margin-top: auto;
 }
 
 /* Scrollbar styling for webkit */
@@ -436,78 +440,10 @@
   color: var(--text-secondary);
 }
 
-.empty-state-suggestions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
-  margin-top: 2rem;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .empty-state-suggestions {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Suggestions removed per user request */
+.empty-state-suggestions,
 .suggestion-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: left;
-}
-
-:root[data-theme="light"] .suggestion-card {
-  background: rgba(0, 0, 0, 0.02);
-  border-color: rgba(0, 0, 0, 0.05);
-}
-
-.suggestion-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-:root[data-theme="light"] .suggestion-card:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
-}
-
-.suggestion-card .feather {
-  color: var(--text-primary);
-  width: 24px;
-  height: 24px;
-  opacity: 0.8;
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.suggestion-card:hover .feather {
-  color: var(--primary-color);
-  transform: scale(1.1);
-}
-
-.suggestion-card span {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  line-height: 1.4;
-  transition: color var(--transition-fast);
-}
-
-.suggestion-card:hover span {
-  color: var(--text-primary);
+  display: none;
 }
 
 /* Bottom Input Dock */

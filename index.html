@@ -90,6 +90,10 @@
                 <i data-feather="settings" class="item-icon" aria-hidden="true"></i>
                 <span class="item-title">Configurações</span>
               </li>
+              <li class="settings-item" role="button" tabindex="0" id="feedback-sidebar-btn">
+                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
+                <span class="item-title">Feedback</span>
+              </li>
             </ul>
           </div>
         </aside>
@@ -153,24 +157,7 @@
                   <h1 class="welcome-title">Olá.</h1>
                   <p class="welcome-subtitle">O que vamos projetar hoje?</p>
                 </div>
-                <div class="empty-state-suggestions">
-                  <button class="suggestion-card" data-prompt="Quero criar um mega-prompt para estruturar um plano de negócios completo. Quais são os blocos essenciais que devo incluir no prompt?">
-                    <i data-feather="layers"></i>
-                    <span>Estruturar Mega-Prompt</span>
-                  </button>
-                  <button class="suggestion-card" data-prompt="Me ajude a definir uma persona especialista em engenharia de software sênior. O prompt deve fazê-lo focar em performance e arquitetura limpa.">
-                    <i data-feather="users"></i>
-                    <span>Criar Persona Especialista</span>
-                  </button>
-                  <button class="suggestion-card" data-prompt="Tenho um script em Python antigo. Quero um prompt que não apenas refatore o código, mas explique as decisões arquiteturais tomadas.">
-                    <i data-feather="terminal"></i>
-                    <span>Converter Lógica em Prompt</span>
-                  </button>
-                  <button class="suggestion-card" data-prompt="Estou analisando dados de vendas. Como estruturo um prompt para extrair um framework de análise e tirar os melhores insights do modelo?">
-                    <i data-feather="grid"></i>
-                    <span>Extrair Framework de Análise</span>
-                  </button>
-                </div>
+
               </div>
               <!-- Messages will be injected here -->
             </div>
@@ -194,6 +181,28 @@
 
           </main>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Enviar Feedback</h2>
+        <button id="close-feedback-btn" class="icon-btn" aria-label="Fechar modal">
+          <i data-feather="x"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="feedback-desc">Sua opinião é fundamental para a evolução do Zenith. Deixe seu feedback, sugestão de melhoria ou reporte um erro abaixo.</p>
+        <textarea id="feedback-input" rows="5" placeholder="Descreva sua experiência ou sugestão aqui..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button id="submit-feedback-btn" class="primary-action-btn">
+          <span class="btn-text">Enviar Feedback</span>
+          <div class="spinner hidden"></div>
+        </button>
       </div>
     </div>
   </div>
