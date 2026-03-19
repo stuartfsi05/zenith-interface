@@ -50,8 +50,10 @@ function initializeComponents(): void {
         async (errorMsg: string) => {
           if (errorMsg === 'UNAUTHORIZED') {
             Toast.show('Sessão expirada. Redirecionando...', 'error');
-            AuthModule.logout();
-            UI.showLoginView();
+            setTimeout(() => {
+              AuthModule.logout();
+              UI.showLoginView();
+            }, 1800);
           } else {
             const errorHtml = `<p class="error-msg">${MarkdownProcessor.escapeHTML(errorMsg)}</p>`;
             events.emit(EVENTS.STREAM_ERROR, errorHtml);

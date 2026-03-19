@@ -68,6 +68,6 @@ export const StorageManager = {
     sessionStorage.removeItem('zenith_token');
     sessionStorage.removeItem('zenith_session');
     localStorage.removeItem('zenith_user');
-    localStorage.removeItem('zenith_google_api_key');
+    // We intentionally DO NOT clear zenith_google_api_key to prioritize user convenience across sessions.
   }
 };

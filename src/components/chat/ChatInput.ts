@@ -26,7 +26,12 @@ export class ChatInputComponent {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         if (!this.sendBtn.disabled) {
-          this.form.dispatchEvent(new Event('submit'));
+          // Native clean way to trigger HTML5 Form sumbission with all validations
+          if (typeof this.form.requestSubmit === 'function') {
+            this.form.requestSubmit();
+          } else {
+            this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+          }
         }
       }
     });
