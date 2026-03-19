@@ -48,9 +48,26 @@ export const StorageManager = {
     sessionStorage.setItem('zenith_session', crypto.randomUUID());
   },
 
+  setSessionId: (id: string): void => {
+    sessionStorage.setItem('zenith_session', id);
+  },
+
+  getApiKey: (): string | null => {
+    return localStorage.getItem('zenith_google_api_key');
+  },
+
+  setApiKey: (key: string): void => {
+    localStorage.setItem('zenith_google_api_key', key);
+  },
+
+  removeApiKey: (): void => {
+    localStorage.removeItem('zenith_google_api_key');
+  },
+
   clearAll: (): void => {
     sessionStorage.removeItem('zenith_token');
     sessionStorage.removeItem('zenith_session');
     localStorage.removeItem('zenith_user');
+    localStorage.removeItem('zenith_google_api_key');
   }
 };

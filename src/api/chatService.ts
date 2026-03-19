@@ -10,14 +10,23 @@ export const ApiModule = {
     onFinish: () => void
   ) => {
     const token = StorageManager.getToken();
+    const apiKey = StorageManager.getApiKey();
     
+    // Configura os headers base
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    // Só anexa o header se a chave existir
+    if (apiKey) {
+      headers['x-google-api-key'] = apiKey;
+    }
+
     try {
       const response = await fetch(`${config.apiBaseUrl}/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify({
           session_id: sessionId,
           message: message
@@ -89,6 +98,23 @@ export const ApiModule = {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ message })
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) throw new Error("UNAUTHORIZED");
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  },
+
+  getSessions: async () => {
+    const token = StorageManager.getToken();
+    const response = await fetch(`${config.apiBaseUrl}/sessions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {

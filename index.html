@@ -85,11 +85,13 @@
           </div>
 
           <div class="sidebar-bottom">
+            <div class="sidebar-api-key-container" style="padding: 0 15px; margin-bottom: 12px;">
+              <label for="sidebar-api-key" class="sidebar-section-title" style="padding: 0; margin-bottom: 8px; font-size: 0.75rem; display: block;" title="É obrigatório fornecer sua própria chave Google API para usar o Zenith">Sua Google API Key</label>
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" id="sidebar-api-key" placeholder="Cole sua API Key aqui..." autocomplete="off" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); background: var(--surface-light); color: var(--text-color); padding: 8px 12px; font-size: 0.85rem; outline: none;">
+              </div>
+            </div>
             <ul class="settings-list" aria-label="Configurações e Ajuda">
-              <li class="settings-item" role="button" tabindex="0">
-                <i data-feather="settings" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Configurações</span>
-              </li>
               <li class="settings-item" role="button" tabindex="0" id="feedback-sidebar-btn">
                 <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
                 <span class="item-title">Feedback</span>
@@ -206,7 +208,6 @@
       </div>
     </div>
   </div>
-
 
   <script type="module" src="/src/main.ts"></script>
 </body>

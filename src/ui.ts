@@ -47,6 +47,8 @@ export const UI = {
   submitFeedbackBtn: document.getElementById('submit-feedback-btn') as HTMLButtonElement,
   feedbackInput: document.getElementById('feedback-input') as HTMLTextAreaElement,
 
+  sidebarApiKeyInput: document.getElementById('sidebar-api-key') as HTMLInputElement,
+
   // --- View State Management ---
 
   /** Transitions the interface to the Chat View. */

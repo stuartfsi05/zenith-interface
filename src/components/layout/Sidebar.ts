@@ -2,6 +2,7 @@ import feather from 'feather-icons';
 import { Toast } from '../toast';
 import { StorageManager } from '../../core/storage';
 import { UI } from '../../ui';
+import { ApiModule } from '../../api/chatService';
 
 export class SidebarComponent {
   private sidebar: HTMLElement;
@@ -22,6 +23,62 @@ export class SidebarComponent {
     this.appTitle = document.querySelector('.app-title');
 
     this.bindEvents();
+    this.loadHistory();
+  }
+
+  public async loadHistory() {
+    try {
+      const data = await ApiModule.getSessions();
+      const list = document.querySelector('.chat-history-list') as HTMLUListElement;
+      const emptyMsg = document.getElementById('empty-history-message');
+      
+      if (!list) return;
+      list.innerHTML = '';
+      
+      if (data.sessions && data.sessions.length > 0) {
+        if (emptyMsg) emptyMsg.style.display = 'none';
+        
+        data.sessions.forEach((s: any) => {
+          const li = document.createElement('li');
+          li.className = 'history-item';
+          li.dataset.sessionId = s.id;
+          
+          const dateStr = new Date(s.last_active).toLocaleDateString('pt-BR');
+          
+          li.innerHTML = `
+            <i data-feather="message-circle" class="item-icon"></i>
+            <span class="history-title item-title">Sessão de ${dateStr}</span>
+            <div class="item-actions">
+              <button class="action-icon" aria-label="Opções" tabindex="-1">
+                <i data-feather="more-horizontal"></i>
+              </button>
+              <div class="history-dropdown">
+                <button class="dropdown-item action-rename" tabindex="-1">
+                  <i data-feather="edit-2"></i>
+                  <span>Renomear</span>
+                </button>
+                <button class="dropdown-item action-trash delete-text" tabindex="-1">
+                  <i data-feather="trash-2"></i>
+                  <span>Excluir</span>
+                </button>
+              </div>
+            </div>
+          `;
+          
+          list.appendChild(li);
+        });
+        
+        feather.replace();
+        
+        // Re-query and bind items
+        this.historyItems = document.querySelectorAll('.history-item');
+        this.bindHistoryItems();
+      } else {
+        if (emptyMsg) emptyMsg.style.display = 'block';
+      }
+    } catch (e) {
+      console.error("Erro ao carregar sessões.", e);
+    }
   }
 
   private bindEvents() {
@@ -110,6 +167,24 @@ export class SidebarComponent {
       }
     });
 
+    // Event Listeners: Sidebar API Key directly
+    // Pre-popula o input se já houver uma chave salva
+    const savedKey = StorageManager.getApiKey();
+    if (savedKey) {
+      UI.sidebarApiKeyInput.value = savedKey;
+    }
+
+    // Usamos 'change' ou 'blur' para salvar imediatamente quando o usuário preencher
+    UI.sidebarApiKeyInput.addEventListener('change', () => {
+      const newKey = UI.sidebarApiKeyInput.value.trim();
+      if (newKey) {
+        StorageManager.setApiKey(newKey);
+        Toast.show("API Key salva localmente! Pronta para uso.", "success");
+      } else {
+        StorageManager.removeApiKey();
+      }
+    });
+
     // Global click to close all dropdowns
     document.addEventListener('click', () => {
       document.querySelectorAll('.history-dropdown.show').forEach(dropdown => {
@@ -126,6 +201,11 @@ export class SidebarComponent {
       // Opening a Chat
       item.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).closest('.item-actions') || (e.target as HTMLElement).tagName.toLowerCase() === 'input') return;
+
+        const sid = (item as HTMLElement).dataset.sessionId;
+        if (sid) {
+          StorageManager.setSessionId(sid);
+        }
 
         this.historyItems.forEach(hi => hi.classList.remove('active'));
         item.classList.add('active');
