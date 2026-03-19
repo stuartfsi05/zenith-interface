@@ -168,20 +168,44 @@ export class SidebarComponent {
     });
 
     // Event Listeners: Sidebar API Key directly
+    const statusIcon = document.getElementById('api-key-status-icon');
+    
+    const updateApiKeyVisuals = (key: string | null) => {
+      if (key) {
+        UI.sidebarApiKeyInput.style.borderColor = '#10b981';
+        UI.sidebarApiKeyInput.style.background = 'rgba(16, 185, 129, 0.05)';
+        if (statusIcon) statusIcon.style.display = 'block';
+      } else {
+        UI.sidebarApiKeyInput.style.borderColor = 'var(--border-color)';
+        UI.sidebarApiKeyInput.style.background = 'var(--surface-light)';
+        if (statusIcon) statusIcon.style.display = 'none';
+      }
+    };
+
     // Pre-popula o input se já houver uma chave salva
     const savedKey = StorageManager.getApiKey();
     if (savedKey) {
       UI.sidebarApiKeyInput.value = savedKey;
+      updateApiKeyVisuals(savedKey);
     }
+
+    // Remova os efeitos visuais enquanto estiver digitando
+    UI.sidebarApiKeyInput.addEventListener('input', () => {
+      UI.sidebarApiKeyInput.style.borderColor = 'var(--border-color)';
+      UI.sidebarApiKeyInput.style.background = 'var(--surface-light)';
+      if (statusIcon) statusIcon.style.display = 'none';
+    });
 
     // Usamos 'change' ou 'blur' para salvar imediatamente quando o usuário preencher
     UI.sidebarApiKeyInput.addEventListener('change', () => {
       const newKey = UI.sidebarApiKeyInput.value.trim();
       if (newKey) {
         StorageManager.setApiKey(newKey);
+        updateApiKeyVisuals(newKey);
         Toast.show("API Key salva localmente! Pronta para uso.", "success");
       } else {
         StorageManager.removeApiKey();
+        updateApiKeyVisuals(null);
       }
     });
 
