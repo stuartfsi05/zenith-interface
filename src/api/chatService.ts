@@ -37,7 +37,12 @@ export const ApiModule = {
         if (response.status === 401) {
              throw new Error("UNAUTHORIZED");
         }
-        throw new Error(`API Error: ${response.status}`);
+        let errMsg = `API Error: ${response.status}`;
+        try {
+            const errData = await response.json();
+            if (errData.detail) errMsg = errData.detail;
+        } catch (e) {}
+        throw new Error(errMsg);
       }
 
       if (!response.body) throw new Error('ReadableStream not supported');
@@ -84,7 +89,11 @@ export const ApiModule = {
       }
 
     } catch (err: any) {
-        onError(err.message === "UNAUTHORIZED" ? "UNAUTHORIZED" : "Erro de Conexão: Não foi possível alcançar o Motor Zenith.");
+        if (err.message === "UNAUTHORIZED") {
+            onError("UNAUTHORIZED");
+        } else {
+            onError(err.message || "Erro de Conexão: Não foi possível alcançar o Motor Zenith.");
+        }
         onFinish();
     }
   },
