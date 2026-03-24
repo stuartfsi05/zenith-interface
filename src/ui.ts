@@ -27,6 +27,7 @@ export const UI = {
   chatView: document.getElementById('chat-view')!,
   loginForm: document.getElementById('login-form') as HTMLFormElement,
   loginBtn: document.getElementById('login-btn') as HTMLButtonElement,
+  authToggleBtn: document.getElementById('auth-toggle-btn') as HTMLAnchorElement,
   loginEmailInput: document.getElementById('email') as HTMLInputElement,
   loginPasswordInput: document.getElementById('password') as HTMLInputElement,
   loginError: document.getElementById('login-error')!,
@@ -50,6 +51,21 @@ export const UI = {
   sidebarApiKeyInput: document.getElementById('sidebar-api-key') as HTMLInputElement,
 
   // --- View State Management ---
+  authMode: 'login' as 'login' | 'register',
+
+  setAuthMode(mode: 'login' | 'register'): void {
+    this.authMode = mode;
+    const btnText = this.loginBtn.querySelector('.btn-text');
+    if (this.authMode === 'register') {
+      if (btnText) btnText.textContent = 'Criar Conta';
+      this.authToggleBtn.textContent = 'Já possui uma conta? Entre aqui.';
+      this.loginError.classList.add('hidden');
+    } else {
+      if (btnText) btnText.textContent = 'Entrar';
+      this.authToggleBtn.textContent = 'Não possui uma conta? Crie uma aqui.';
+      this.loginError.classList.add('hidden');
+    }
+  },
 
   /** Transitions the interface to the Chat View. */
   showChatView(): void {
@@ -68,16 +84,24 @@ export const UI = {
   /** Updates the login button state to reflect an ongoing auth request. */
   setLoginLoading(isLoading: boolean): void {
     UI.loginBtn.disabled = isLoading;
+    const actionText = UI.authMode === 'register' ? 'Criando conta...' : 'Entrando...';
+    const defaultText = UI.authMode === 'register' ? 'Criar Conta' : 'Entrar';
+    
     if (isLoading) {
-      UI.loginBtn.innerHTML = '<span class="spinner"></span><span class="btn-text hidden">Entrando...</span>';
+      UI.loginBtn.innerHTML = `<span class="spinner"></span><span class="btn-text hidden">${actionText}</span>`;
       UI.loginError.classList.add('hidden');
     } else {
-      UI.loginBtn.innerHTML = '<span class="btn-text">Entrar</span>';
+      UI.loginBtn.innerHTML = `<span class="btn-text">${defaultText}</span>`;
     }
   },
 
   /** Displays the authentication error banner. */
-  showLoginError(): void {
+  showLoginError(msg?: string): void {
+    if (msg) {
+      UI.loginError.textContent = msg;
+    } else {
+      UI.loginError.textContent = 'Credenciais inválidas. Tente novamente.';
+    }
     UI.loginError.classList.remove('hidden');
   },
 

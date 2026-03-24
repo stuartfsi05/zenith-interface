@@ -26,6 +26,30 @@ export const AuthModule = {
     StorageManager.setUser(data.user_info || { id: 'unknown', email });
   },
 
+  register: async (email: string, password: string): Promise<void> => {
+    const response = await fetch(`${config.apiBaseUrl}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || 'Falha ao registrar usuário.');
+    }
+
+    const data: TokenResponse = await response.json();
+    if (data.access_token) {
+      StorageManager.setToken(data.access_token);
+      StorageManager.setUser(data.user_info || { id: 'unknown', email });
+    } else {
+      // In case Supabase requires email verification, we wouldn't have a token.
+      throw new Error('VERIFICATION_REQUIRED');
+    }
+  },
+
   logout: (): void => {
     StorageManager.clearAll();
   },

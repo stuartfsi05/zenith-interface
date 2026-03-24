@@ -77,7 +77,7 @@ function initializeComponents(): void {
  * Global Event Setup
  */
 function setupGlobalListeners(): void {
-  // Handle Login Submission
+  // Handle Auth Form Submission
   UI.loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = UI.loginEmailInput.value;
@@ -86,17 +86,37 @@ function setupGlobalListeners(): void {
     UI.setLoginLoading(true);
 
     try {
-      await AuthModule.login(email, password);
+      if (UI.authMode === 'login') {
+        await AuthModule.login(email, password);
+        Toast.show('Autenticado com sucesso', 'success');
+      } else {
+        await AuthModule.register(email, password);
+        Toast.show('Conta criada com sucesso!', 'success');
+      }
       UI.showChatView();
       initializeComponents();
-      Toast.show('Autenticado com sucesso', 'success');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Auth failure:', err);
-      UI.showLoginError();
+      // If error message from the backend exists, surface it.
+      if (err.message === 'VERIFICATION_REQUIRED') {
+        UI.showLoginError('Conta criada! Verifique a caixa de entrada do seu e-mail para confirmar o cadastro antes de entrar.');
+        UI.setAuthMode('login'); // Reverte pro login
+      } else {
+        UI.showLoginError(err.message || 'Credenciais inválidas. Tente novamente.');
+      }
     } finally {
       UI.setLoginLoading(false);
     }
   });
+
+  // Handle Auth Toggle (Login <-> Register)
+  if (UI.authToggleBtn) {
+    UI.authToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const newMode = UI.authMode === 'login' ? 'register' : 'login';
+      UI.setAuthMode(newMode);
+    });
+  }
 
   // Handle Logout
   UI.logoutBtn.addEventListener('click', () => {

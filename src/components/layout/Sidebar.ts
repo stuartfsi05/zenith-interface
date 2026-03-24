@@ -150,7 +150,6 @@ export class SidebarComponent {
         if (spinner) spinner.classList.remove('hidden');
         UI.submitFeedbackBtn.disabled = true;
 
-        const { ApiModule } = await import('../../api/chatService');
         await ApiModule.sendFeedback(feedbackText);
         
         UI.feedbackModal.classList.add('hidden');
