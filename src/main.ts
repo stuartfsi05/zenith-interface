@@ -99,10 +99,14 @@ function setupGlobalListeners(): void {
       console.error('Auth failure:', err);
       // If error message from the backend exists, surface it.
       if (err.message === 'VERIFICATION_REQUIRED') {
-        UI.showLoginError('Conta criada! Verifique a caixa de entrada do seu e-mail para confirmar o cadastro antes de entrar.');
+        const msg = 'Conta criada! Verifique a caixa de entrada do seu e-mail (incluindo SPAM) para confirmar o cadastro antes de entrar.';
+        UI.showLoginError(msg);
+        Toast.show(msg, 'info');
         UI.setAuthMode('login'); // Reverte pro login
       } else {
-        UI.showLoginError(err.message || 'Credenciais inválidas. Tente novamente.');
+        const msg = err.message || 'Credenciais inválidas. Tente novamente.';
+        UI.showLoginError(msg);
+        Toast.show(msg, 'error');
       }
     } finally {
       UI.setLoginLoading(false);

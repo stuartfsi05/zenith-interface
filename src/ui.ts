@@ -56,14 +56,24 @@ export const UI = {
   setAuthMode(mode: 'login' | 'register'): void {
     this.authMode = mode;
     const btnText = this.loginBtn.querySelector('.btn-text');
+    const title = document.getElementById('auth-title');
+    const desc = document.getElementById('auth-desc');
+    const container = document.querySelector('.login-container');
+
     if (this.authMode === 'register') {
       if (btnText) btnText.textContent = 'Criar Conta';
       this.authToggleBtn.textContent = 'Já possui uma conta? Entre aqui.';
       this.loginError.classList.add('hidden');
+      if (title) title.textContent = 'Zenith | Nova Credencial';
+      if (desc) desc.innerHTML = 'Junte-se à plataforma de Engenharia de Prompts.<br>Insira um e-mail válido e crie uma <b>senha forte com no mínimo 6 caracteres</b>.';
+      if (container) container.classList.add('register-mode');
     } else {
       if (btnText) btnText.textContent = 'Entrar';
       this.authToggleBtn.textContent = 'Não possui uma conta? Crie uma aqui.';
       this.loginError.classList.add('hidden');
+      if (title) title.textContent = 'Zenith | O Arquiteto de Prompts';
+      if (desc) desc.textContent = 'Analisa, otimiza e refina seus prompts para máxima qualidade, clareza e segurança. Zenith atua como seu especialista em engenharia de prompt, aplicando um processo estruturado para transformar ideias em instruções de IA de nível profissional. Use-o para: criar prompts complexos do zero, depurar falhas em prompts existentes e aprender as melhores práticas de interação com IA.';
+      if (container) container.classList.remove('register-mode');
     }
   },
 

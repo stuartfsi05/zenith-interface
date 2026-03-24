@@ -146,3 +146,25 @@ button[type="submit"]:disabled {
   margin-top: 1rem;
   text-align: center;
 }
+
+/* --- Registration Mode Visual Distinctiveness --- */
+.register-mode .brand h1 {
+  color: var(--accent-light);
+  font-weight: 500;
+}
+
+.register-mode button[type="submit"] {
+  background: var(--accent-color);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.register-mode button[type="submit"]:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+}
+
+.register-mode .logo-placeholder svg path {
+  stroke: url(#zenith-glow-avatar); /* Change logo gradient slightly based on another gradient */
+}
