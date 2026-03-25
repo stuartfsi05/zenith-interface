@@ -347,13 +347,19 @@
   font-style: italic;
 }
 
+.code-block-wrapper {
+  position: relative;
+  margin: 1.25rem 0;
+}
+
 .message-content pre {
   background: #111112; /* Darker background for code */
   border: 1px solid var(--border-color);
   padding: 1.25rem;
+  padding-top: 2.5rem; /* Make room for the copy button */
   border-radius: 12px;
   overflow-x: auto;
-  margin: 1.25rem 0;
+  margin: 0; /* Margin is handled by the wrapper */
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
@@ -371,6 +377,34 @@
   color: #e3e3e3;
   font-size: 0.85rem;
   line-height: 1.5;
+}
+
+.code-block-copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e3e3e3;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  z-index: 10;
+}
+
+.code-block-copy-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.code-block-copy-btn .feather {
+  width: 14px;
+  height: 14px;
 }
 
 .message-content ul,
