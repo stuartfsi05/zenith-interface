@@ -113,11 +113,16 @@ export class SidebarComponent {
     // Event Listeners: Settings and Feedback
     this.settingsItems.forEach(setting => {
       setting.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
         const title = (e.currentTarget as HTMLElement).querySelector('.item-title')?.textContent;
         if (title === 'Feedback') {
-          UI.feedbackModal.classList.remove('hidden');
-          UI.feedbackInput.value = '';
-          UI.feedbackInput.focus();
+          // Use requestAnimationFrame to decouple from current click event cycle
+          requestAnimationFrame(() => {
+            UI.feedbackModal.classList.remove('hidden');
+            UI.feedbackInput.value = '';
+            UI.feedbackInput.focus();
+          });
         } else {
           Toast.show(`⚡ Módulo: ${title} em fase de integração.`, "info");
         }
@@ -125,12 +130,14 @@ export class SidebarComponent {
     });
 
     // Event Listeners: Feedback Modal specific
-    UI.closeFeedbackBtn.addEventListener('click', () => {
+    UI.closeFeedbackBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       UI.feedbackModal.classList.add('hidden');
     });
 
     UI.feedbackModal.addEventListener('click', (e) => {
       if (e.target === UI.feedbackModal) {
+        e.stopPropagation();
         UI.feedbackModal.classList.add('hidden');
       }
     });
