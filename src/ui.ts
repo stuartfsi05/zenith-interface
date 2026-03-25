@@ -144,6 +144,9 @@ export const UI = {
     content.className = 'message-content';
     content.innerHTML = htmlContent;
 
+    // 4b. Apply Code Block Copy Buttons
+    this._applyCodeBlockActions(content);
+
     msgDiv.appendChild(avatar);
     msgDiv.appendChild(content);
 
@@ -231,6 +234,44 @@ export const UI = {
     wrapper.appendChild(actionsDiv);
 
     container.replaceChild(wrapper, contentElement);
+  },
+
+  /** Internal: Adds a copy button to all code blocks (<pre> elements) within the content. */
+  _applyCodeBlockActions(contentElement: HTMLElement): void {
+    const preElements = contentElement.querySelectorAll('pre');
+    preElements.forEach(pre => {
+      // Create wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+      
+      // Insert wrapper before pre, then move pre into wrapper
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      // Create copy button
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'code-block-copy-btn';
+      copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Código';
+      
+      copyBtn.onclick = () => {
+        // Extract text from the code element inside if it exists, otherwise use pre's text
+        const codeElement = pre.querySelector('code');
+        const textToCopy = codeElement ? codeElement.innerText : pre.innerText;
+        
+        navigator.clipboard.writeText(textToCopy);
+        copyBtn.innerHTML = '<i data-feather="check"></i> Copiado';
+        feather.replace();
+        
+        // Reset after 2 seconds
+        setTimeout(() => {
+          copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Código';
+          feather.replace();
+        }, 2000);
+      };
+
+      // Append copy button to wrapper
+      wrapper.appendChild(copyBtn);
+    });
   }
 };
 
