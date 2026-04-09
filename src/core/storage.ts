@@ -10,64 +10,64 @@ export interface User {
 
 export const StorageManager = {
   getToken: (): string => {
-    return sessionStorage.getItem('zenith_token') || '';
+    return sessionStorage.getItem("zenith_token") || "";
   },
-  
+
   setToken: (token: string): void => {
-    sessionStorage.setItem('zenith_token', token);
+    sessionStorage.setItem("zenith_token", token);
   },
-  
+
   removeToken: (): void => {
-    sessionStorage.removeItem('zenith_token');
+    sessionStorage.removeItem("zenith_token");
   },
 
   getUser: (): User | null => {
-    const userStr = localStorage.getItem('zenith_user');
+    const userStr = localStorage.getItem("zenith_user");
     return userStr ? JSON.parse(userStr) : null;
   },
 
   setUser: (user: User): void => {
     // Basic user info is safer in localStorage than a JWT
-    localStorage.setItem('zenith_user', JSON.stringify(user));
+    localStorage.setItem("zenith_user", JSON.stringify(user));
   },
 
   removeUser: (): void => {
-    localStorage.removeItem('zenith_user');
+    localStorage.removeItem("zenith_user");
   },
 
   getSessionId: (): string => {
-    let id = sessionStorage.getItem('zenith_session');
+    let id = sessionStorage.getItem("zenith_session");
     if (!id) {
       id = crypto.randomUUID();
-      sessionStorage.setItem('zenith_session', id);
+      sessionStorage.setItem("zenith_session", id);
     }
     return id;
   },
 
   resetSessionId: (): void => {
-    sessionStorage.setItem('zenith_session', crypto.randomUUID());
+    sessionStorage.setItem("zenith_session", crypto.randomUUID());
   },
 
   setSessionId: (id: string): void => {
-    sessionStorage.setItem('zenith_session', id);
+    sessionStorage.setItem("zenith_session", id);
   },
 
   getApiKey: (): string | null => {
-    return localStorage.getItem('zenith_google_api_key');
+    return localStorage.getItem("zenith_google_api_key");
   },
 
   setApiKey: (key: string): void => {
-    localStorage.setItem('zenith_google_api_key', key);
+    localStorage.setItem("zenith_google_api_key", key);
   },
 
   removeApiKey: (): void => {
-    localStorage.removeItem('zenith_google_api_key');
+    localStorage.removeItem("zenith_google_api_key");
   },
 
   clearAll: (): void => {
-    sessionStorage.removeItem('zenith_token');
-    sessionStorage.removeItem('zenith_session');
-    localStorage.removeItem('zenith_user');
+    sessionStorage.removeItem("zenith_token");
+    sessionStorage.removeItem("zenith_session");
+    localStorage.removeItem("zenith_user");
     // We intentionally DO NOT clear zenith_google_api_key to prioritize user convenience across sessions.
-  }
+  },
 };

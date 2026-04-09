@@ -1,4 +1,4 @@
-import { events, EVENTS } from '../../core/eventBus';
+import { events, EVENTS } from "../../core/eventBus";
 
 export class ChatInputComponent {
   private form: HTMLFormElement;
@@ -6,40 +6,42 @@ export class ChatInputComponent {
   private sendBtn: HTMLButtonElement;
 
   constructor() {
-    this.form = document.getElementById('chat-form') as HTMLFormElement;
-    this.input = document.getElementById('chat-input') as HTMLTextAreaElement;
-    this.sendBtn = document.getElementById('send-btn') as HTMLButtonElement;
+    this.form = document.getElementById("chat-form") as HTMLFormElement;
+    this.input = document.getElementById("chat-input") as HTMLTextAreaElement;
+    this.sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
 
     this.bindEvents();
   }
 
   private bindEvents() {
     // Auto-resize logic and disable/enable Send button
-    this.input.addEventListener('input', () => {
-      this.input.style.height = 'auto';
-      this.input.style.height = this.input.scrollHeight + 'px';
+    this.input.addEventListener("input", () => {
+      this.input.style.height = "auto";
+      this.input.style.height = this.input.scrollHeight + "px";
       this.sendBtn.disabled = this.input.value.trim().length === 0;
     });
 
     // Enter to submit (Shift+Enter for newline)
-    this.input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+    this.input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         if (!this.sendBtn.disabled) {
           // Native clean way to trigger HTML5 Form sumbission with all validations
-          if (typeof this.form.requestSubmit === 'function') {
+          if (typeof this.form.requestSubmit === "function") {
             this.form.requestSubmit();
           } else {
-            this.form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            this.form.dispatchEvent(
+              new Event("submit", { cancelable: true, bubbles: true }),
+            );
           }
         }
       }
     });
 
     // Form submission
-    this.form.addEventListener('submit', (e) => {
+    this.form.addEventListener("submit", (e) => {
       e.preventDefault();
-      
+
       const message = this.input.value.trim();
       if (!message) return;
 
@@ -52,16 +54,16 @@ export class ChatInputComponent {
   }
 
   private resetInput() {
-    this.input.value = '';
-    this.input.style.height = 'auto';
+    this.input.value = "";
+    this.input.style.height = "auto";
     this.sendBtn.disabled = true;
   }
 
   // Exposed API for other components to force input entry
   public setQuery(text: string) {
     this.input.value = text;
-    this.input.style.height = 'auto';
-    this.input.style.height = this.input.scrollHeight + 'px';
+    this.input.style.height = "auto";
+    this.input.style.height = this.input.scrollHeight + "px";
     this.sendBtn.disabled = false;
     this.input.focus();
   }

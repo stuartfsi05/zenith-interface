@@ -11,13 +11,15 @@ class EventBus {
 
     // Return unsubscribe function
     return () => {
-      this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
+      this.listeners[event] = this.listeners[event].filter(
+        (cb) => cb !== callback,
+      );
     };
   }
 
   emit(event: string, data?: any) {
     if (this.listeners[event]) {
-      this.listeners[event].forEach(callback => {
+      this.listeners[event].forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
@@ -32,21 +34,21 @@ export const events = new EventBus();
 
 export const EVENTS = {
   // Auth
-  AUTH_STATE_CHANGED: 'AUTH_STATE_CHANGED',
-  USER_LOGGED_IN: 'USER_LOGGED_IN',
-  USER_LOGGED_OUT: 'USER_LOGGED_OUT',
-  
+  AUTH_STATE_CHANGED: "AUTH_STATE_CHANGED",
+  USER_LOGGED_IN: "USER_LOGGED_IN",
+  USER_LOGGED_OUT: "USER_LOGGED_OUT",
+
   // Chat
-  MESSAGE_SENT: 'MESSAGE_SENT',
-  CHUNK_RECEIVED: 'CHUNK_RECEIVED',
-  STREAM_FINISHED: 'STREAM_FINISHED',
-  STREAM_ERROR: 'STREAM_ERROR',
-  
+  MESSAGE_SENT: "MESSAGE_SENT",
+  CHUNK_RECEIVED: "CHUNK_RECEIVED",
+  STREAM_FINISHED: "STREAM_FINISHED",
+  STREAM_ERROR: "STREAM_ERROR",
+
   // Sidebar / History
-  HISTORY_UPDATED: 'HISTORY_UPDATED',
-  CHAT_SELECTED: 'CHAT_SELECTED',
-  NEW_CHAT_REQUESTED: 'NEW_CHAT_REQUESTED',
-  
+  HISTORY_UPDATED: "HISTORY_UPDATED",
+  CHAT_SELECTED: "CHAT_SELECTED",
+  NEW_CHAT_REQUESTED: "NEW_CHAT_REQUESTED",
+
   // Settings
-  SETTINGS_TOGGLED: 'SETTINGS_TOGGLED',
+  SETTINGS_TOGGLED: "SETTINGS_TOGGLED",
 } as const;

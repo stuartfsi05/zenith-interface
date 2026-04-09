@@ -1,221 +1,437 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zenith | Prompt Architect Engine</title>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zenith | Prompt Architect Engine</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
 
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-
-</head>
-
-<body>
-  <div id="app">
-    <!-- Login View -->
-    <div id="login-view" class="view active">
-      <div class="login-container">
-        <div class="brand">
-          <div class="logo-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
-              <!-- Ascending Peak / Architect Chevron -->
-              <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-lg)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-lg)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
-              <!-- Zenith Spark / Node -->
-              <circle cx="50" cy="12" r="6" fill="#14b8a6" /> <!-- Teal accent -->
-              <defs>
-                <linearGradient id="zenith-glow-lg" x1="0%" y1="100%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#4f46e5" /> <!-- Indigo -->
-                  <stop offset="50%" stop-color="#8b5cf6" /> <!-- Violet -->
-                  <stop offset="100%" stop-color="#67e8f9" /> <!-- Cyan highlighting -->
-                </linearGradient>
-              </defs>
-            </svg>
+  <body>
+    <div id="app">
+      <!-- Login View -->
+      <div id="login-view" class="view active">
+        <div class="login-container">
+          <div class="brand">
+            <div class="logo-placeholder">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 100 100"
+                width="100%"
+                height="100%"
+                fill="none"
+              >
+                <!-- Ascending Peak / Architect Chevron -->
+                <path
+                  d="M20 75 L50 25 L80 75"
+                  stroke="url(#zenith-glow-lg)"
+                  stroke-width="8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M35 75 L50 50 L65 75"
+                  stroke="url(#zenith-glow-lg)"
+                  stroke-width="8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  opacity="0.35"
+                />
+                <!-- Zenith Spark / Node -->
+                <circle cx="50" cy="12" r="6" fill="#14b8a6" />
+                <!-- Teal accent -->
+                <defs>
+                  <linearGradient
+                    id="zenith-glow-lg"
+                    x1="0%"
+                    y1="100%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stop-color="#4f46e5" />
+                    <!-- Indigo -->
+                    <stop offset="50%" stop-color="#8b5cf6" />
+                    <!-- Violet -->
+                    <stop offset="100%" stop-color="#67e8f9" />
+                    <!-- Cyan highlighting -->
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <h1 id="auth-title">Zenith | O Arquiteto de Prompts</h1>
+            <p id="auth-desc">
+              Analisa, otimiza e refina seus prompts para máxima qualidade,
+              clareza e segurança. Zenith atua como seu especialista em
+              engenharia de prompt, aplicando um processo estruturado para
+              transformar ideias em instruções de IA de nível profissional.
+              Use-o para: criar prompts complexos do zero, depurar falhas em
+              prompts existentes e aprender as melhores práticas de interação
+              com IA.
+            </p>
           </div>
-          <h1 id="auth-title">Zenith | O Arquiteto de Prompts</h1>
-          <p id="auth-desc">Analisa, otimiza e refina seus prompts para máxima qualidade, clareza e segurança. Zenith atua como seu
-            especialista em engenharia de prompt, aplicando um processo estruturado para transformar ideias em
-            instruções de IA de nível profissional. Use-o para: criar prompts complexos do zero, depurar falhas em
-            prompts existentes e aprender as melhores práticas de interação com IA.</p>
-        </div>
-        <form id="login-form">
-          <div class="input-group">
-            <input type="email" id="email" name="email" required placeholder="Email" autocomplete="email">
-          </div>
-          <div class="input-group" style="position: relative;">
-            <input type="password" id="password" name="password" required placeholder="Senha"
-              autocomplete="current-password">
-            <button type="button" id="toggle-password" class="toggle-password-btn" aria-label="Mostrar senha">
-              <i data-feather="eye"></i>
+          <form id="login-form">
+            <div class="input-group">
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                placeholder="Email"
+                autocomplete="email"
+              />
+            </div>
+            <div class="input-group" style="position: relative">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                placeholder="Senha"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                class="toggle-password-btn"
+                aria-label="Mostrar senha"
+              >
+                <i data-feather="eye"></i>
+              </button>
+            </div>
+            <button type="submit" id="login-btn">
+              <span class="btn-text">Entrar</span>
+              <div class="spinner hidden"></div>
             </button>
+
+            <div
+              class="auth-toggle-container"
+              style="text-align: center; margin-top: 15px"
+            >
+              <a
+                href="#"
+                id="auth-toggle-btn"
+                style="
+                  color: var(--accent-color);
+                  font-size: 0.85rem;
+                  text-decoration: none;
+                  transition: opacity 0.2s;
+                "
+                >Não possui uma conta? Crie uma aqui.</a
+              >
+            </div>
+
+            <div id="login-error" class="error-msg hidden">
+              Credenciais inválidas. Tente novamente.
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Chat View (Gemini Style) -->
+      <div id="chat-view" class="view hidden">
+        <div class="chat-container">
+          <!-- Sidebar Layout -->
+          <aside id="sidebar" class="sidebar">
+            <div class="sidebar-top">
+              <button
+                id="new-chat-btn"
+                class="sidebar-action-btn primary-action"
+                aria-label="Iniciar novo chat"
+                tabindex="0"
+              >
+                <i data-feather="plus"></i>
+                <span class="btn-text">Novo Chat</span>
+              </button>
+            </div>
+
+            <div class="sidebar-middle">
+              <h3 class="sidebar-section-title">Recentes</h3>
+              <div id="empty-history-message" class="empty-history-text">
+                Nenhuma conversa recente
+              </div>
+              <ul class="chat-history-list" aria-label="Histórico de Chats">
+                <!-- O histórico será populado dinamicamente -->
+              </ul>
+            </div>
+
+            <div class="sidebar-bottom">
+              <div
+                class="sidebar-api-key-container"
+                style="padding: 0 15px; margin-bottom: 12px"
+              >
+                <label
+                  for="sidebar-api-key"
+                  class="sidebar-section-title"
+                  style="
+                    padding: 0;
+                    margin-bottom: 8px;
+                    font-size: 0.75rem;
+                    display: block;
+                  "
+                  title="É obrigatório fornecer sua própria chave Google API para usar o Zenith"
+                  >Sua Google API Key</label
+                >
+                <div
+                  style="position: relative; display: flex; align-items: center"
+                >
+                  <input
+                    type="password"
+                    id="sidebar-api-key"
+                    placeholder="Cole sua API Key aqui..."
+                    autocomplete="off"
+                    style="
+                      width: 100%;
+                      border-radius: 6px;
+                      border: 1px solid var(--border-color);
+                      background: var(--surface-light);
+                      color: var(--text-color);
+                      padding: 8px 30px 8px 12px;
+                      font-size: 0.85rem;
+                      outline: none;
+                      transition: all 0.2s;
+                    "
+                  />
+                  <i
+                    id="api-key-status-icon"
+                    data-feather="check-circle"
+                    style="
+                      position: absolute;
+                      right: 10px;
+                      color: #10b981;
+                      width: 14px;
+                      height: 14px;
+                      display: none;
+                    "
+                  ></i>
+                </div>
+              </div>
+              <ul class="settings-list" aria-label="Configurações e Ajuda">
+                <li
+                  class="settings-item"
+                  role="button"
+                  tabindex="0"
+                  id="feedback-sidebar-btn"
+                >
+                  <i
+                    data-feather="message-square"
+                    class="item-icon"
+                    aria-hidden="true"
+                  ></i>
+                  <span class="item-title">Feedback</span>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+          <!-- Main Workspace -->
+          <div class="main-workspace">
+            <!-- Top Navigation -->
+            <header class="top-nav">
+              <div class="nav-left">
+                <!-- Sidebar toggle moved inside sidebar itself for internal open state, and also kept out here when closed initially or depending on logic -->
+                <button
+                  id="open-sidebar-btn"
+                  class="icon-btn"
+                  title="Menu principal"
+                  aria-label="Expandir menu lateral"
+                  aria-expanded="false"
+                  tabindex="0"
+                >
+                  <i data-feather="menu"></i>
+                </button>
+                <div class="app-title">
+                  <span class="logo-text">Zenith</span>
+                </div>
+              </div>
+              <div
+                class="nav-center"
+                id="nav-center"
+                style="
+                  position: relative;
+                  display: none;
+                  justify-content: center;
+                "
+              >
+                <button
+                  class="model-selector"
+                  id="header-model-selector"
+                  aria-label="Opções do chat atual"
+                >
+                  <span>Zenith Engine (Transient)</span>
+                  <i data-feather="chevron-down"></i>
+                </button>
+                <div
+                  class="history-dropdown header-dropdown"
+                  id="header-chat-dropdown"
+                >
+                  <button
+                    class="dropdown-item action-pin"
+                    id="header-action-pin"
+                  >
+                    <i data-feather="map-pin"></i> Fixar
+                  </button>
+                  <button
+                    class="dropdown-item action-rename"
+                    id="header-action-rename"
+                  >
+                    <i data-feather="edit-2"></i> Renomear
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    class="dropdown-item action-delete danger"
+                    id="header-action-delete"
+                  >
+                    <i data-feather="trash-2"></i> Excluir
+                  </button>
+                </div>
+              </div>
+              <div class="nav-right">
+                <button
+                  id="theme-toggle-btn"
+                  class="icon-btn tooltip-container"
+                  title="Alternar tema"
+                >
+                  <i data-feather="sun" id="theme-icon"></i>
+                </button>
+                <button
+                  id="logout-btn"
+                  class="icon-btn tooltip-container"
+                  title="Encerrar Sessão"
+                >
+                  <i data-feather="log-out"></i>
+                </button>
+                <div class="user-avatar" id="user-display">
+                  <i data-feather="user"></i>
+                </div>
+              </div>
+            </header>
+
+            <!-- Main Centered Content -->
+            <main class="chat-main">
+              <div id="chat-history" class="chat-history empty-mode">
+                <!-- Welcome State -->
+                <div id="welcome-state" class="welcome-container fade-in-up">
+                  <div class="welcome-hero">
+                    <div class="welcome-logo">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 100 100"
+                        width="100%"
+                        height="100%"
+                        fill="none"
+                      >
+                        <path
+                          d="M20 75 L50 25 L80 75"
+                          stroke="url(#zenith-glow-hero)"
+                          stroke-width="8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M35 75 L50 50 L65 75"
+                          stroke="url(#zenith-glow-hero)"
+                          stroke-width="8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          opacity="0.35"
+                        />
+                        <circle cx="50" cy="12" r="6" fill="#14b8a6" />
+                        <defs>
+                          <linearGradient
+                            id="zenith-glow-hero"
+                            x1="0%"
+                            y1="100%"
+                            x2="100%"
+                            y2="0%"
+                          >
+                            <stop offset="0%" stop-color="#4f46e5" />
+                            <stop offset="50%" stop-color="#8b5cf6" />
+                            <stop offset="100%" stop-color="#67e8f9" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                    <h1 class="welcome-title">Olá.</h1>
+                    <p class="welcome-subtitle">O que vamos projetar hoje?</p>
+                  </div>
+                </div>
+                <!-- Messages will be injected here -->
+              </div>
+
+              <!-- Bottom Input Area -->
+              <div class="input-container-wrapper">
+                <form id="chat-form">
+                  <div class="chat-input-box">
+                    <textarea
+                      id="chat-input"
+                      placeholder="Peça ao Zenith"
+                      rows="1"
+                    ></textarea>
+                    <div class="input-actions">
+                      <button
+                        type="submit"
+                        id="send-btn"
+                        class="send-btn"
+                        disabled
+                      >
+                        <i data-feather="arrow-up"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+                <div class="disclaimer">
+                  O Zenith projeta arquiteturas cognitivas e prompts
+                  estruturados. Toda lógica gerada requer validação direcional
+                  humana.
+                </div>
+              </div>
+            </main>
           </div>
-          <button type="submit" id="login-btn">
-            <span class="btn-text">Entrar</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Enviar Feedback</h2>
+          <button
+            id="close-feedback-btn"
+            class="icon-btn"
+            aria-label="Fechar modal"
+          >
+            <i data-feather="x"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="feedback-desc">
+            Sua opinião é fundamental para a evolução do Zenith. Deixe seu
+            feedback, sugestão de melhoria ou reporte um erro abaixo.
+          </p>
+          <textarea
+            id="feedback-input"
+            rows="5"
+            placeholder="Descreva sua experiência ou sugestão aqui..."
+          ></textarea>
+        </div>
+        <div class="modal-footer">
+          <button id="submit-feedback-btn" class="primary-action-btn">
+            <span class="btn-text">Enviar Feedback</span>
             <div class="spinner hidden"></div>
           </button>
-          
-          <div class="auth-toggle-container" style="text-align: center; margin-top: 15px;">
-            <a href="#" id="auth-toggle-btn" style="color: var(--accent-color); font-size: 0.85rem; text-decoration: none; transition: opacity 0.2s;">Não possui uma conta? Crie uma aqui.</a>
-          </div>
-
-          <div id="login-error" class="error-msg hidden">Credenciais inválidas. Tente novamente.</div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Chat View (Gemini Style) -->
-    <div id="chat-view" class="view hidden">
-      <div class="chat-container">
-
-        <!-- Sidebar Layout -->
-        <aside id="sidebar" class="sidebar">
-          <div class="sidebar-top">
-            <button id="new-chat-btn" class="sidebar-action-btn primary-action" aria-label="Iniciar novo chat" tabindex="0">
-              <i data-feather="plus"></i>
-              <span class="btn-text">Novo Chat</span>
-            </button>
-          </div>
-
-          <div class="sidebar-middle">
-            <h3 class="sidebar-section-title">Recentes</h3>
-            <div id="empty-history-message" class="empty-history-text">Nenhuma conversa recente</div>
-            <ul class="chat-history-list" aria-label="Histórico de Chats">
-              <!-- O histórico será populado dinamicamente -->
-            </ul>
-          </div>
-
-          <div class="sidebar-bottom">
-            <div class="sidebar-api-key-container" style="padding: 0 15px; margin-bottom: 12px;">
-              <label for="sidebar-api-key" class="sidebar-section-title" style="padding: 0; margin-bottom: 8px; font-size: 0.75rem; display: block;" title="É obrigatório fornecer sua própria chave Google API para usar o Zenith">Sua Google API Key</label>
-              <div style="position: relative; display: flex; align-items: center;">
-                <input type="password" id="sidebar-api-key" placeholder="Cole sua API Key aqui..." autocomplete="off" style="width: 100%; border-radius: 6px; border: 1px solid var(--border-color); background: var(--surface-light); color: var(--text-color); padding: 8px 30px 8px 12px; font-size: 0.85rem; outline: none; transition: all 0.2s;">
-                <i id="api-key-status-icon" data-feather="check-circle" style="position: absolute; right: 10px; color: #10b981; width: 14px; height: 14px; display: none;"></i>
-              </div>
-            </div>
-            <ul class="settings-list" aria-label="Configurações e Ajuda">
-              <li class="settings-item" role="button" tabindex="0" id="feedback-sidebar-btn">
-                <i data-feather="message-square" class="item-icon" aria-hidden="true"></i>
-                <span class="item-title">Feedback</span>
-              </li>
-            </ul>
-          </div>
-        </aside>
-
-        <!-- Main Workspace -->
-        <div class="main-workspace">
-          <!-- Top Navigation -->
-          <header class="top-nav">
-            <div class="nav-left">
-              <!-- Sidebar toggle moved inside sidebar itself for internal open state, and also kept out here when closed initially or depending on logic -->
-              <button id="open-sidebar-btn" class="icon-btn" title="Menu principal" aria-label="Expandir menu lateral" aria-expanded="false" tabindex="0">
-                <i data-feather="menu"></i>
-              </button>
-              <div class="app-title">
-                <span class="logo-text">Zenith</span>
-              </div>
-            </div>
-            <div class="nav-center" id="nav-center" style="position: relative; display: none; justify-content: center;">
-              <button class="model-selector" id="header-model-selector" aria-label="Opções do chat atual">
-                <span>Zenith Engine (Transient)</span> <i data-feather="chevron-down"></i>
-              </button>
-              <div class="history-dropdown header-dropdown" id="header-chat-dropdown">
-                <button class="dropdown-item action-pin" id="header-action-pin"><i data-feather="map-pin"></i> Fixar</button>
-                <button class="dropdown-item action-rename" id="header-action-rename"><i data-feather="edit-2"></i> Renomear</button>
-                <div class="dropdown-divider"></div>
-                <button class="dropdown-item action-delete danger" id="header-action-delete"><i data-feather="trash-2"></i> Excluir</button>
-              </div>
-            </div>
-            <div class="nav-right">
-              <button id="theme-toggle-btn" class="icon-btn tooltip-container" title="Alternar tema">
-                <i data-feather="sun" id="theme-icon"></i>
-              </button>
-              <button id="logout-btn" class="icon-btn tooltip-container" title="Encerrar Sessão">
-                <i data-feather="log-out"></i>
-              </button>
-              <div class="user-avatar" id="user-display"><i data-feather="user"></i></div>
-            </div>
-          </header>
-
-          <!-- Main Centered Content -->
-          <main class="chat-main">
-
-            <div id="chat-history" class="chat-history empty-mode">
-              <!-- Welcome State -->
-              <div id="welcome-state" class="welcome-container fade-in-up">
-                <div class="welcome-hero">
-                  <div class="welcome-logo">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
-                      <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-hero)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-hero)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
-                      <circle cx="50" cy="12" r="6" fill="#14b8a6" />
-                      <defs>
-                        <linearGradient id="zenith-glow-hero" x1="0%" y1="100%" x2="100%" y2="0%">
-                          <stop offset="0%" stop-color="#4f46e5" />
-                          <stop offset="50%" stop-color="#8b5cf6" />
-                          <stop offset="100%" stop-color="#67e8f9" />
-                        </linearGradient>
-                      </defs>
-                    </svg>                  
-                  </div>
-                  <h1 class="welcome-title">Olá.</h1>
-                  <p class="welcome-subtitle">O que vamos projetar hoje?</p>
-                </div>
-
-              </div>
-              <!-- Messages will be injected here -->
-            </div>
-
-            <!-- Bottom Input Area -->
-            <div class="input-container-wrapper">
-              <form id="chat-form">
-                <div class="chat-input-box">
-                  <textarea id="chat-input" placeholder="Peça ao Zenith" rows="1"></textarea>
-                  <div class="input-actions">
-                    <button type="submit" id="send-btn" class="send-btn" disabled>
-                      <i data-feather="arrow-up"></i>
-                    </button>
-                  </div>
-                </div>
-              </form>
-              <div class="disclaimer">
-                O Zenith projeta arquiteturas cognitivas e prompts estruturados. Toda lógica gerada requer validação direcional humana.
-              </div>
-            </div>
-
-          </main>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Feedback Modal -->
-  <div id="feedback-modal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Enviar Feedback</h2>
-        <button id="close-feedback-btn" class="icon-btn" aria-label="Fechar modal">
-          <i data-feather="x"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p class="feedback-desc">Sua opinião é fundamental para a evolução do Zenith. Deixe seu feedback, sugestão de melhoria ou reporte um erro abaixo.</p>
-        <textarea id="feedback-input" rows="5" placeholder="Descreva sua experiência ou sugestão aqui..."></textarea>
-      </div>
-      <div class="modal-footer">
-        <button id="submit-feedback-btn" class="primary-action-btn">
-          <span class="btn-text">Enviar Feedback</span>
-          <div class="spinner hidden"></div>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script type="module" src="/src/main.ts"></script>
-</body>
-
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>

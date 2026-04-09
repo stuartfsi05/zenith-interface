@@ -91,7 +91,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  transition: color var(--transition-fast), background var(--transition-fast);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .toggle-password-btn:hover {
