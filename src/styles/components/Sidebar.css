@@ -246,3 +246,19 @@
   padding: 1rem;
   margin-top: auto;
 }
+
+.api-key-helper {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.api-key-helper a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.api-key-helper a:hover {
+  text-decoration: underline;
+}

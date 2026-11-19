@@ -1,7 +1,11 @@
 import "./style.css";
 import feather from "feather-icons";
 import { AuthModule } from "./api/authService";
-import { ApiModule } from "./api/chatService";
+import {
+  ApiModule,
+  type MetaMetadata,
+  type QualityMetadata,
+} from "./api/chatService";
 import { UI } from "./ui";
 import { MarkdownProcessor } from "./markdown";
 import { StorageManager } from "./core/storage";
@@ -12,37 +16,74 @@ import { SidebarComponent } from "./components/layout/Sidebar";
 import { HeaderComponent } from "./components/layout/Header";
 import { Toast } from "./components/toast";
 
-/**
- * Zenith Frontend Entry Point
- *
- * Orchestrates the lifecycle of the application, including authentication,
- * component initialization, and global event coordination.
- */
-
 let isChatInitialized = false;
 
-/**
- * Initializes visual components andWires core engine events.
- */
+function updateModeQuotaBadge(
+  mode: string,
+  model: string,
+  remaining: number | null,
+  dailyLimit?: number,
+): void {
+  const badge = document.getElementById("mode-quota-badge");
+  if (!badge) return;
+
+  if (mode === "byok") {
+    badge.textContent = `Modo Pro • ${model}`;
+    badge.classList.add("byok-active");
+    badge.title = "Usando sua Google API Key pessoal em todos os módulos";
+  } else {
+    const quotaText =
+      typeof remaining === "number"
+        ? typeof dailyLimit === "number"
+          ? `${remaining}/${dailyLimit} hoje`
+          : `${remaining} restantes hoje`
+        : "Grátis";
+    badge.textContent = `Modo Demo • ${quotaText}`;
+    badge.classList.remove("byok-active");
+    badge.title =
+      "Modo Demo gratuito com Gemini 3.5 Flash-Lite. Adicione sua API Key opcional na barra lateral para liberar Gemini 3.8 Flash.";
+  }
+}
+
+async function refreshQuotaBadge(): Promise<void> {
+  try {
+    const quota = await ApiModule.getQuota();
+    updateModeQuotaBadge(
+      quota.mode,
+      quota.model,
+      quota.remaining,
+      quota.daily_limit,
+    );
+  } catch {
+    /* Non-fatal if backend is still waking up */
+  }
+}
+
 function initializeComponents(): void {
   if (isChatInitialized) return;
 
-  // Instantiate layout and functional components
   new ChatInputComponent();
   new ChatWindowComponent();
   new SidebarComponent();
   new HeaderComponent();
 
-  // Wire Chat Message Stream: Connects UI events to API Service
+  events.subscribe(EVENTS.QUOTA_UPDATED, () => {
+    refreshQuotaBadge();
+  });
+
+  events.subscribe(EVENTS.META_RECEIVED, (meta: MetaMetadata) => {
+    if (meta) {
+      updateModeQuotaBadge(meta.mode, meta.model, meta.remaining_quota);
+    }
+  });
+
   events.subscribe(EVENTS.MESSAGE_SENT, async (message: string) => {
     let isFirstChunk = true;
     let accumulatedText = "";
 
     try {
-      await ApiModule.sendChatStream(
-        message,
-        StorageManager.getSessionId(),
-        (chunkContent: string) => {
+      await ApiModule.sendChatStream(message, StorageManager.getSessionId(), {
+        onChunk: (chunkContent: string) => {
           accumulatedText += chunkContent;
           events.emit(EVENTS.CHUNK_RECEIVED, {
             isFirst: isFirstChunk,
@@ -50,7 +91,13 @@ function initializeComponents(): void {
           });
           isFirstChunk = false;
         },
-        async (errorMsg: string) => {
+        onMeta: (meta: MetaMetadata) => {
+          events.emit(EVENTS.META_RECEIVED, meta);
+        },
+        onQuality: (quality: QualityMetadata) => {
+          events.emit(EVENTS.QUALITY_RECEIVED, quality);
+        },
+        onError: async (errorMsg: string) => {
           if (errorMsg === "UNAUTHORIZED") {
             Toast.show("Sessão expirada. Redirecionando...", "error");
             setTimeout(() => {
@@ -60,13 +107,14 @@ function initializeComponents(): void {
           } else {
             const errorHtml = `<p class="error-msg">${MarkdownProcessor.escapeHTML(errorMsg)}</p>`;
             events.emit(EVENTS.STREAM_ERROR, errorHtml);
-            Toast.show("Erro de comunicação com o motor.", "error");
+            Toast.show(errorMsg, "error");
           }
         },
-        () => {
-          // Stream Complete handled in child components
+        onFinish: () => {
+          events.emit(EVENTS.STREAM_FINISHED);
+          events.emit(EVENTS.HISTORY_UPDATED);
         },
-      );
+      });
     } catch (err) {
       console.error("Fatal Stream Error:", err);
       Toast.show("Erro crítico na transmissão.", "error");
@@ -76,11 +124,7 @@ function initializeComponents(): void {
   isChatInitialized = true;
 }
 
-/**
- * Global Event Setup
- */
 function setupGlobalListeners(): void {
-  // Handle Auth Form Submission
   UI.loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = UI.loginEmailInput.value;
@@ -98,15 +142,15 @@ function setupGlobalListeners(): void {
       }
       UI.showChatView();
       initializeComponents();
+      refreshQuotaBadge();
     } catch (err: any) {
       console.error("Auth failure:", err);
-      // If error message from the backend exists, surface it.
       if (err.message === "VERIFICATION_REQUIRED") {
         const msg =
           "Conta criada! Verifique a caixa de entrada do seu e-mail (incluindo SPAM) para confirmar o cadastro antes de entrar.";
         UI.showLoginError(msg);
         Toast.show(msg, "info");
-        UI.setAuthMode("login"); // Reverte pro login
+        UI.setAuthMode("login");
       } else {
         const msg = err.message || "Credenciais inválidas. Tente novamente.";
         UI.showLoginError(msg);
@@ -117,7 +161,6 @@ function setupGlobalListeners(): void {
     }
   });
 
-  // Handle Auth Toggle (Login <-> Register)
   if (UI.authToggleBtn) {
     UI.authToggleBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -126,14 +169,12 @@ function setupGlobalListeners(): void {
     });
   }
 
-  // Handle Logout
   UI.logoutBtn.addEventListener("click", () => {
     AuthModule.logout();
     UI.showLoginView();
     Toast.show("Sessão encerrada", "info");
   });
 
-  // Password Visibility Toggle
   const togglePasswordBtn = document.getElementById("toggle-password");
   if (togglePasswordBtn) {
     togglePasswordBtn.addEventListener("click", () => {
@@ -154,24 +195,21 @@ function setupGlobalListeners(): void {
   }
 }
 
-/**
- * Application Bootstrapper
- */
 function boot(): void {
-  // 1. Setup Listeners
+  // Warm up serverless backend (e.g. Render Free cold start) early
+  ApiModule.checkHealth();
+
   setupGlobalListeners();
 
-  // 2. Perform Session Pre-flight
   if (AuthModule.isAuthenticated()) {
     UI.showChatView();
     initializeComponents();
+    refreshQuotaBadge();
   } else {
     UI.showLoginView();
   }
 
-  // 3. Render Icons
   feather.replace();
 }
 
-// Start application
 boot();

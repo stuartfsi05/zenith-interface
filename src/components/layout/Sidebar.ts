@@ -1,8 +1,9 @@
 import feather from "feather-icons";
-import { Toast } from "../toast";
-import { StorageManager } from "../../core/storage";
-import { UI } from "../../ui";
 import { ApiModule } from "../../api/chatService";
+import { events, EVENTS } from "../../core/eventBus";
+import { StorageManager } from "../../core/storage";
+import { UI, ZENITH_LOGO_SVG } from "../../ui";
+import { Toast } from "../toast";
 
 export class SidebarComponent {
   private sidebar: HTMLElement;
@@ -39,12 +40,17 @@ export class SidebarComponent {
       if (!list) return;
       list.innerHTML = "";
 
+      const activeSid = StorageManager.getSessionId();
+
       if (data.sessions && data.sessions.length > 0) {
         if (emptyMsg) emptyMsg.style.display = "none";
 
         data.sessions.forEach((s: any) => {
           const li = document.createElement("li");
           li.className = "history-item";
+          if (s.id === activeSid) {
+            li.classList.add("active");
+          }
           li.dataset.sessionId = s.id;
 
           const dateStr = new Date(s.last_active).toLocaleDateString("pt-BR");
@@ -53,15 +59,15 @@ export class SidebarComponent {
             <i data-feather="message-circle" class="item-icon"></i>
             <span class="history-title item-title">Sessão de ${dateStr}</span>
             <div class="item-actions">
-              <button class="action-icon" aria-label="Opções" tabindex="-1">
+              <button type="button" class="action-icon" aria-label="Opções" tabindex="-1">
                 <i data-feather="more-horizontal"></i>
               </button>
               <div class="history-dropdown">
-                <button class="dropdown-item action-rename" tabindex="-1">
+                <button type="button" class="dropdown-item action-rename" tabindex="-1">
                   <i data-feather="edit-2"></i>
                   <span>Renomear</span>
                 </button>
-                <button class="dropdown-item action-trash delete-text" tabindex="-1">
+                <button type="button" class="dropdown-item action-trash delete-text" tabindex="-1">
                   <i data-feather="trash-2"></i>
                   <span>Excluir</span>
                 </button>
@@ -74,7 +80,6 @@ export class SidebarComponent {
 
         feather.replace();
 
-        // Re-query and bind items
         this.historyItems = document.querySelectorAll(".history-item");
         this.bindHistoryItems();
       } else {
@@ -85,19 +90,25 @@ export class SidebarComponent {
     }
   }
 
-  private bindEvents() {
-    // Event Listeners: Sidebar Toggles
-    this.openSidebarBtn.addEventListener("click", UI.toggleSidebar);
+  private closeFeedbackModal() {
+    if (!UI.feedbackModal.classList.contains("hidden")) {
+      UI.feedbackModal.classList.add("hidden");
+      UI.feedbackBtn?.focus();
+    }
+  }
 
-    // Event Listeners: New Chat
+  private bindEvents() {
+    this.openSidebarBtn.addEventListener("click", UI.toggleSidebar);
     this.newChatBtn.addEventListener("click", () => this.handleNewChat());
 
-    // Event Listeners: Logo Home
     if (this.appTitle) {
       this.appTitle.addEventListener("click", () => this.handleNewChat());
     }
 
-    // Event Listeners: Theme
+    events.subscribe(EVENTS.HISTORY_UPDATED, () => {
+      this.loadHistory();
+    });
+
     this.themeToggleBtn.addEventListener("click", () => {
       const currentTheme =
         document.documentElement.getAttribute("data-theme") || "dark";
@@ -106,16 +117,14 @@ export class SidebarComponent {
 
       const icon = document.getElementById("theme-icon");
       if (icon) {
-        if (newTheme === "light") {
-          icon.setAttribute("data-feather", "moon");
-        } else {
-          icon.setAttribute("data-feather", "sun");
-        }
+        icon.setAttribute(
+          "data-feather",
+          newTheme === "light" ? "moon" : "sun",
+        );
         feather.replace();
       }
     });
 
-    // Event Listeners: Settings and Feedback
     this.settingsItems.forEach((setting) => {
       setting.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -124,7 +133,6 @@ export class SidebarComponent {
           ".item-title",
         )?.textContent;
         if (title === "Feedback") {
-          // Use requestAnimationFrame to decouple from current click event cycle
           requestAnimationFrame(() => {
             UI.feedbackModal.classList.remove("hidden");
             UI.feedbackInput.value = "";
@@ -136,16 +144,21 @@ export class SidebarComponent {
       });
     });
 
-    // Event Listeners: Feedback Modal specific
     UI.closeFeedbackBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      UI.feedbackModal.classList.add("hidden");
+      this.closeFeedbackModal();
     });
 
     UI.feedbackModal.addEventListener("click", (e) => {
       if (e.target === UI.feedbackModal) {
         e.stopPropagation();
-        UI.feedbackModal.classList.add("hidden");
+        this.closeFeedbackModal();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        this.closeFeedbackModal();
       }
     });
 
@@ -166,9 +179,9 @@ export class SidebarComponent {
 
         await ApiModule.sendFeedback(feedbackText);
 
-        UI.feedbackModal.classList.add("hidden");
+        this.closeFeedbackModal();
         Toast.show("Feedback enviado com sucesso! Obrigado.", "success");
-      } catch (err: any) {
+      } catch {
         Toast.show("Erro ao enviar feedback. Tente novamente.", "error");
       } finally {
         const btnText = UI.submitFeedbackBtn.querySelector(".btn-text");
@@ -180,7 +193,6 @@ export class SidebarComponent {
       }
     });
 
-    // Event Listeners: Sidebar API Key directly
     const statusIcon = document.getElementById("api-key-status-icon");
 
     const updateApiKeyVisuals = (key: string | null) => {
@@ -195,34 +207,32 @@ export class SidebarComponent {
       }
     };
 
-    // Pre-popula o input se já houver uma chave salva
     const savedKey = StorageManager.getApiKey();
     if (savedKey) {
       UI.sidebarApiKeyInput.value = savedKey;
       updateApiKeyVisuals(savedKey);
     }
 
-    // Remova os efeitos visuais enquanto estiver digitando
     UI.sidebarApiKeyInput.addEventListener("input", () => {
       UI.sidebarApiKeyInput.style.borderColor = "var(--border-color)";
       UI.sidebarApiKeyInput.style.background = "var(--surface-light)";
       if (statusIcon) statusIcon.style.display = "none";
     });
 
-    // Usamos 'change' ou 'blur' para salvar imediatamente quando o usuário preencher
     UI.sidebarApiKeyInput.addEventListener("change", () => {
       const newKey = UI.sidebarApiKeyInput.value.trim();
       if (newKey) {
         StorageManager.setApiKey(newKey);
         updateApiKeyVisuals(newKey);
-        Toast.show("API Key salva localmente! Pronta para uso.", "success");
+        Toast.show("API Key salva! Gemini 3.8 Flash ativado.", "success");
       } else {
         StorageManager.removeApiKey();
         updateApiKeyVisuals(null);
+        Toast.show("API Key removida. Voltando ao Modo Demo grátis.", "info");
       }
+      events.emit(EVENTS.QUOTA_UPDATED);
     });
 
-    // Global click to close all dropdowns
     document.addEventListener("click", () => {
       document
         .querySelectorAll(".history-dropdown.show")
@@ -231,48 +241,31 @@ export class SidebarComponent {
         });
     });
 
-    // History Items Click (Loading state & Actions)
     this.bindHistoryItems();
   }
 
   private bindHistoryItems() {
     this.historyItems.forEach((item) => {
-      // Opening a Chat
-      item.addEventListener("click", (e) => {
+      item.addEventListener("click", async (e) => {
         if (
           (e.target as HTMLElement).closest(".item-actions") ||
           (e.target as HTMLElement).tagName.toLowerCase() === "input"
-        )
+        ) {
           return;
-
-        const sid = (item as HTMLElement).dataset.sessionId;
-        if (sid) {
-          StorageManager.setSessionId(sid);
         }
 
+        const sid = (item as HTMLElement).dataset.sessionId;
+        if (!sid) return;
+
+        StorageManager.setSessionId(sid);
         this.historyItems.forEach((hi) => hi.classList.remove("active"));
         item.classList.add("active");
         UI.chatHistory.classList.remove("empty-mode");
 
         UI.chatHistory.innerHTML = `
           <div class="message system-message fade-in-up">
-            <div class="message-avatar system-avatar">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
-                <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
-                <circle cx="50" cy="12" r="6" fill="#14b8a6" />
-                <defs>
-                  <linearGradient id="zenith-glow-avatar" x1="0%" y1="100%" x2="100%" y2="0%">
-                    <stop offset="0%" stop-color="#4f46e5" />
-                    <stop offset="50%" stop-color="#8b5cf6" />
-                    <stop offset="100%" stop-color="#67e8f9" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div class="message-content">
-              <p>Carregando memória da sessão...</p>
-            </div>
+            <div class="message-avatar system-avatar">${ZENITH_LOGO_SVG}</div>
+            <div class="message-content"><p>Carregando histórico da sessão...</p></div>
           </div>
         `;
 
@@ -288,36 +281,19 @@ export class SidebarComponent {
           modelSelectorText.textContent = titleSpan.textContent;
         }
 
-        setTimeout(() => {
-          UI.chatHistory.innerHTML = `
-            <div class="message system-message fade-in-up">
-              <div class="message-avatar system-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
-                  <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
-                  <circle cx="50" cy="12" r="6" fill="#14b8a6" />
-                  <defs>
-                    <linearGradient id="zenith-glow-avatar" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#4f46e5" />
-                      <stop offset="50%" stop-color="#8b5cf6" />
-                      <stop offset="100%" stop-color="#67e8f9" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="message-content">
-                <p>Sessão recuperada. Prontos para continuar.</p>
-              </div>
-            </div>
-          `;
-        }, 800);
+        try {
+          const data = await ApiModule.getSessionMessages(sid);
+          events.emit(EVENTS.SESSION_LOADED, data.messages || []);
+        } catch (err) {
+          console.error("Failed to fetch session messages:", err);
+          Toast.show("Não foi possível carregar o histórico da sessão.", "error");
+        }
 
         if (window.innerWidth <= 768) {
           this.sidebar.classList.add("collapsed");
         }
       });
 
-      // Action Dots: Toggle Dropdown
       const actionIcon = item.querySelector(".action-icon");
       const dropdown = item.querySelector(".history-dropdown");
 
@@ -331,7 +307,6 @@ export class SidebarComponent {
         });
       }
 
-      // Pin Action
       const pinBtn = item.querySelector(".action-pin");
       if (pinBtn) {
         pinBtn.addEventListener("click", (e) => {
@@ -356,7 +331,6 @@ export class SidebarComponent {
         });
       }
 
-      // Rename Action
       const renameBtn = item.querySelector(".action-rename");
       if (renameBtn) {
         renameBtn.addEventListener("click", (e) => {
@@ -369,7 +343,7 @@ export class SidebarComponent {
             const input = document.createElement("input");
             input.type = "text";
             input.value = currentTitle;
-            input.className = "rename-input";
+            input.className = "item-title-edit";
 
             titleSpan.style.display = "none";
             titleSpan.parentElement?.insertBefore(input, titleSpan);
@@ -385,9 +359,9 @@ export class SidebarComponent {
             };
 
             input.addEventListener("blur", saveRename);
-            input.addEventListener("keydown", (e) => {
-              if (e.key === "Enter") saveRename();
-              if (e.key === "Escape") {
+            input.addEventListener("keydown", (ev) => {
+              if (ev.key === "Enter") saveRename();
+              if (ev.key === "Escape") {
                 input.value = currentTitle;
                 saveRename();
               }
@@ -396,17 +370,24 @@ export class SidebarComponent {
         });
       }
 
-      // Delete Action
       const deleteBtn = item.querySelector(".action-trash");
       if (deleteBtn) {
-        deleteBtn.addEventListener("click", (e) => {
+        deleteBtn.addEventListener("click", async (e) => {
           e.stopPropagation();
+          const sid = (item as HTMLElement).dataset.sessionId;
           const title = item.querySelector(".item-title")?.textContent;
-          if (confirm(`Excluir bate-papo: ${title}?`)) {
-            // Remove DOM item
+          if (!confirm(`Excluir bate-papo: ${title}?`)) {
+            return;
+          }
+          try {
+            if (sid) {
+              await ApiModule.deleteSession(sid);
+            }
             item.remove();
-            Toast.show(`Chat "${title}" movido para lixeira.`, "info");
+            Toast.show(`Sessão "${title}" excluída.`, "info");
             this.handleNewChat();
+          } catch {
+            Toast.show("Falha ao excluir a sessão no servidor.", "error");
           }
         });
       }
@@ -416,6 +397,7 @@ export class SidebarComponent {
   private handleNewChat() {
     UI.clearChat();
     StorageManager.resetSessionId();
+    this.historyItems.forEach((hi) => hi.classList.remove("active"));
 
     const navCenter = document.getElementById("nav-center");
     if (navCenter) {

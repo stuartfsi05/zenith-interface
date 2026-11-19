@@ -5,13 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@types/feather-icons": "^4.29.4",
+    "jsdom": "^31.0.1",
     "typescript": "~5.9.3",
-    "vite": "^7.3.1"
+    "vite": "^7.3.1",
+    "vitest": "^5.1.1"
   },
   "dependencies": {
     "@types/dompurify": "^3.0.5",

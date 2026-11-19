@@ -6,11 +6,14 @@ marked.setOptions({
   breaks: true,
 });
 
-// Use local state outside the function if we were doing debounce, but since it's synchronous here:
-// Future optimization (Priority 4): implement debouncing for very fast streams.
 export const MarkdownProcessor = {
+  stripThinkingBlocks: (markdown: string): string => {
+    return markdown.replace(/<thinking>[\s\S]*?<\/thinking>/gi, "").trim();
+  },
+
   parse: (markdown: string): string => {
-    const rawHtml = marked.parse(markdown, { async: false }) as string;
+    const cleaned = MarkdownProcessor.stripThinkingBlocks(markdown);
+    const rawHtml = marked.parse(cleaned, { async: false }) as string;
     return DOMPurify.sanitize(rawHtml);
   },
 

@@ -69,12 +69,9 @@
             <h1 id="auth-title">Zenith | O Arquiteto de Prompts</h1>
             <p id="auth-desc">
               Analisa, otimiza e refina seus prompts para máxima qualidade,
-              clareza e segurança. Zenith atua como seu especialista em
-              engenharia de prompt, aplicando um processo estruturado para
-              transformar ideias em instruções de IA de nível profissional.
-              Use-o para: criar prompts complexos do zero, depurar falhas em
-              prompts existentes e aprender as melhores práticas de interação
-              com IA.
+              clareza e segurança. Experimente grátis no Modo Demo (sem precisar
+              de API Key) ou conecte sua chave gratuita do Google AI Studio para
+              desbloquear o Gemini 3.8 Flash.
             </p>
           </div>
           <form id="login-form">
@@ -172,12 +169,12 @@
                   class="sidebar-section-title"
                   style="
                     padding: 0;
-                    margin-bottom: 8px;
+                    margin-bottom: 6px;
                     font-size: 0.75rem;
                     display: block;
                   "
-                  title="É obrigatório fornecer sua própria chave Google API para usar o Zenith"
-                  >Sua Google API Key</label
+                  title="Opcional: no Modo Demo você já tem cota diária gratuita usando a chave do servidor. Cole sua chave do AI Studio para liberar Gemini 3.8 Flash sem limites diários do app."
+                  >Google API Key (Opcional)</label
                 >
                 <div
                   style="position: relative; display: flex; align-items: center"
@@ -185,7 +182,7 @@
                   <input
                     type="password"
                     id="sidebar-api-key"
-                    placeholder="Cole sua API Key aqui..."
+                    placeholder="Opcional: cole para liberar Gemini 3.8 Flash"
                     autocomplete="off"
                     style="
                       width: 100%;
@@ -212,6 +209,15 @@
                     "
                   ></i>
                 </div>
+                <p class="api-key-helper">
+                  Sem chave? Use o Modo Demo grátis.
+                  <a
+                    href="https://aistudio.google.com/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >Gerar chave gratuita</a
+                  >
+                </p>
               </div>
               <ul class="settings-list" aria-label="Configurações e Ajuda">
                 <li
@@ -294,6 +300,13 @@
                 </div>
               </div>
               <div class="nav-right">
+                <span
+                  id="mode-quota-badge"
+                  class="mode-badge"
+                  title="Modo ativo do motor Zenith"
+                >
+                  Modo Demo
+                </span>
                 <button
                   id="theme-toggle-btn"
                   class="icon-btn tooltip-container"
@@ -316,7 +329,11 @@
 
             <!-- Main Centered Content -->
             <main class="chat-main">
-              <div id="chat-history" class="chat-history empty-mode">
+              <div
+                id="chat-history"
+                class="chat-history empty-mode"
+                aria-live="polite"
+              >
                 <!-- Welcome State -->
                 <div id="welcome-state" class="welcome-container fade-in-up">
                   <div class="welcome-hero">
@@ -360,7 +377,62 @@
                       </svg>
                     </div>
                     <h1 class="welcome-title">Olá.</h1>
-                    <p class="welcome-subtitle">O que vamos projetar hoje?</p>
+                    <p class="welcome-subtitle">
+                      O que vamos projetar e aprender hoje?
+                    </p>
+                  </div>
+                  <div
+                    class="empty-state-suggestions"
+                    aria-label="Exemplos iniciais para começar"
+                  >
+                    <button
+                      type="button"
+                      class="suggestion-card"
+                      data-prompt="Quero criar um prompt profissional do zero para revisar contratos de prestação de serviço identificando riscos jurídicos e financeiros."
+                    >
+                      <span class="suggestion-title">Criar Prompt do Zero</span>
+                      <span class="suggestion-desc"
+                        >Estruture persona, contexto e critérios de qualidade em
+                        1 clique.</span
+                      >
+                    </button>
+                    <button
+                      type="button"
+                      class="suggestion-card"
+                      data-prompt="Tenho um prompt simples que gera respostas genéricas demais. Como posso estruturar contexto, restrições e formato de saída para melhorá-lo?"
+                    >
+                      <span class="suggestion-title"
+                        >Depurar Prompt Existente</span
+                      >
+                      <span class="suggestion-desc"
+                        >Descubra o que falta e transforme respostas vagas em
+                        precisas.</span
+                      >
+                    </button>
+                    <button
+                      type="button"
+                      class="suggestion-card"
+                      data-prompt="Me explique de forma prática e didática quando usar Few-Shot, Chain-of-Thought e Role-Playing, com exemplos reais."
+                    >
+                      <span class="suggestion-title">Aprender Técnicas</span>
+                      <span class="suggestion-desc"
+                        >Entenda o porquê de cada técnica de engenharia de
+                        prompt.</span
+                      >
+                    </button>
+                    <button
+                      type="button"
+                      class="suggestion-card"
+                      data-prompt="Crie um prompt especialista para um Engenheiro Python Sênior revisar código FastAPI focando em segurança, tipagem e performance."
+                    >
+                      <span class="suggestion-title"
+                        >Arquitetura de Código</span
+                      >
+                      <span class="suggestion-desc"
+                        >Gere instruções técnicas de elite para revisão e
+                        arquitetura.</span
+                      >
+                    </button>
                   </div>
                 </div>
                 <!-- Messages will be injected here -->

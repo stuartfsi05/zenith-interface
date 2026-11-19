@@ -25,8 +25,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  width: 250px;
-  /* Balance center */
+  min-width: 180px;
 }
 
 .nav-right {
@@ -260,7 +259,8 @@
   transition: opacity var(--transition-fast);
 }
 
-.message:hover .message-actions {
+.message:hover .message-actions,
+.message:focus-within .message-actions {
   opacity: 1;
 }
 
@@ -477,10 +477,150 @@
   color: var(--text-secondary);
 }
 
-/* Suggestions removed per user request */
-.empty-state-suggestions,
+/* Didactic Welcome Suggestions */
+.empty-state-suggestions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
 .suggestion-card {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.35rem;
+  padding: 1rem 1.15rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  color: var(--text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.suggestion-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.suggestion-card:focus-visible,
+.action-chip:focus-visible,
+.code-block-copy-btn:focus-visible,
+.send-btn:focus-visible,
+.icon-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.suggestion-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.suggestion-desc {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .empty-state-suggestions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mode & Quota Header Badge */
+.mode-badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--surface-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.mode-badge.byok-active {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Quality Audit Card (Out-of-Band The Judge) */
+.quality-panel-card {
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 12px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.quality-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.quality-panel-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.quality-score-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+}
+
+.quality-score-badge.score-high {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.quality-score-badge.score-mid {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.quality-score-badge.score-low {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.quality-panel-feedback {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.refine-prompt-btn {
+  align-self: flex-start;
+  margin-top: 0.15rem;
+}
+
+.stream-status-hint {
+  margin-left: 0.75rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
 }
 
 /* Bottom Input Dock */
@@ -675,9 +815,15 @@
 .zenith-thinking {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
+  justify-content: flex-start;
+  padding: 0.5rem 0;
   animation: pulse-thinking 1.5s infinite alternate ease-in-out;
+}
+
+.zenith-thinking svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
 }
 
 @keyframes pulse-thinking {

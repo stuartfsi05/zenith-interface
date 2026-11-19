@@ -3,7 +3,7 @@ import feather from "feather-icons";
 /**
  * Shared SVG Template for the Zenith Agent Logo.
  */
-const ZENITH_LOGO_SVG = `
+export const ZENITH_LOGO_SVG = `
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" fill="none">
     <path d="M20 75 L50 25 L80 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M35 75 L50 50 L65 75" stroke="url(#zenith-glow-avatar)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"/>
@@ -16,6 +16,43 @@ const ZENITH_LOGO_SVG = `
       </linearGradient>
     </defs>
   </svg>
+`;
+
+export const WELCOME_SUGGESTIONS_HTML = `
+  <div class="empty-state-suggestions" aria-label="Exemplos iniciais para começar">
+    <button
+      type="button"
+      class="suggestion-card"
+      data-prompt="Quero criar um prompt profissional do zero para revisar contratos de prestação de serviço identificando riscos jurídicos e financeiros."
+    >
+      <span class="suggestion-title">Criar Prompt do Zero</span>
+      <span class="suggestion-desc">Estruture persona, contexto e critérios de qualidade em 1 clique.</span>
+    </button>
+    <button
+      type="button"
+      class="suggestion-card"
+      data-prompt="Tenho um prompt simples que gera respostas genéricas demais. Como posso estruturar contexto, restrições e formato de saída para melhorá-lo?"
+    >
+      <span class="suggestion-title">Depurar Prompt Existente</span>
+      <span class="suggestion-desc">Descubra o que falta e transforme respostas vagas em precisas.</span>
+    </button>
+    <button
+      type="button"
+      class="suggestion-card"
+      data-prompt="Me explique de forma prática e didática quando usar Few-Shot, Chain-of-Thought e Role-Playing, com exemplos reais."
+    >
+      <span class="suggestion-title">Aprender Técnicas</span>
+      <span class="suggestion-desc">Entenda o porquê de cada técnica de engenharia de prompt.</span>
+    </button>
+    <button
+      type="button"
+      class="suggestion-card"
+      data-prompt="Crie um prompt especialista para um Engenheiro Python Sênior revisar código FastAPI focando em segurança, tipagem e performance."
+    >
+      <span class="suggestion-title">Arquitetura de Código</span>
+      <span class="suggestion-desc">Gere instruções técnicas de elite para revisão e arquitetura.</span>
+    </button>
+  </div>
 `;
 
 /**
@@ -84,7 +121,7 @@ export const UI = {
       if (title) title.textContent = "Zenith | O Arquiteto de Prompts";
       if (desc)
         desc.textContent =
-          "Analisa, otimiza e refina seus prompts para máxima qualidade, clareza e segurança. Zenith atua como seu especialista em engenharia de prompt, aplicando um processo estruturado para transformar ideias em instruções de IA de nível profissional. Use-o para: criar prompts complexos do zero, depurar falhas em prompts existentes e aprender as melhores práticas de interação com IA.";
+          "Analisa, otimiza e refina seus prompts para máxima qualidade, clareza e segurança. Experimente grátis no Modo Demo (sem precisar de API Key) ou conecte sua chave gratuita do Google AI Studio para desbloquear o Gemini 3.8 Flash.";
       if (container) container.classList.remove("register-mode");
     }
   },
@@ -128,68 +165,16 @@ export const UI = {
     UI.loginError.classList.remove("hidden");
   },
 
-  // --- Chat Lifecycle Management ---
-
-  /**
-   * Appends a new message to the conversation history.
-   *
-   * @param role The source of the message ('user' or 'system').
-   * @param htmlContent The processed HTML to display.
-   * @returns The HTML element containing the content.
-   */
-  appendMessage(role: "user" | "system", htmlContent: string): HTMLElement {
-    // 1. Exit empty mode on first interaction
-    if (UI.chatHistory.classList.contains("empty-mode")) {
-      this._teardownEmptyState();
-    }
-
-    // 2. Create Message Container
-    const msgDiv = document.createElement("div");
-    msgDiv.className = `message ${role}-message fade-in-up`;
-
-    // 3. Render Avatar
-    const avatar = document.createElement("div");
-    avatar.className = "message-avatar";
-    avatar.innerHTML =
-      role === "system" ? ZENITH_LOGO_SVG : '<i data-feather="user"></i>';
-
-    // 4. Render Content
-    const content = document.createElement("div");
-    content.className = "message-content";
-    content.innerHTML = htmlContent;
-
-    // 4b. Apply Code Block Copy Buttons
-    this._applyCodeBlockActions(content);
-
-    msgDiv.appendChild(avatar);
-    msgDiv.appendChild(content);
-
-    // 5. Apply AI-Specific Actions (Copy to Clipboard)
-    if (role === "system") {
-      this._applyMessageActions(msgDiv, content);
-    }
-
-    // 6. Push to DOM & Scroll
-    UI.chatHistory.appendChild(msgDiv);
-    UI.chatHistory.scrollTop = UI.chatHistory.scrollHeight;
-
-    // Refresh icons
-    setTimeout(() => feather.replace(), 10);
-
-    return content;
-  },
-
-  /**
-   * Resets the conversation history to the welcome state.
-   */
+  /** Resets the conversation history to the welcome state. */
   clearChat(): void {
     UI.chatHistory.innerHTML = `
       <div id="welcome-state" class="welcome-container fade-in-up">
         <div class="welcome-hero">
           <div class="welcome-logo">${ZENITH_LOGO_SVG}</div>
           <h1 class="welcome-title">Olá.</h1>
-          <p class="welcome-subtitle">O que vamos projetar hoje?</p>
+          <p class="welcome-subtitle">O que vamos projetar e aprender hoje?</p>
         </div>
+        ${WELCOME_SUGGESTIONS_HTML}
       </div>
     `;
     UI.chatHistory.classList.add("empty-mode");
@@ -205,76 +190,26 @@ export const UI = {
     UI.sidebar.classList.toggle("collapsed");
   },
 
-  // --- Internal Helpers ---
-
-  /** Internal: Removes welcome screen and updates header state. */
-  _teardownEmptyState(): void {
-    UI.chatHistory.classList.remove("empty-mode");
-    document.getElementById("welcome-state")?.remove();
-
-    const navCenter = document.getElementById("nav-center");
-    if (navCenter) {
-      navCenter.style.display = "flex";
-      const headerText = navCenter.querySelector("span");
-      if (
-        headerText &&
-        headerText.textContent === "Zenith Engine (Transient)"
-      ) {
-        headerText.textContent = "Conversa Ativa";
-      }
-    }
-  },
-
-  /** Internal: Attaches interactive action buttons to a message. */
-  _applyMessageActions(
-    container: HTMLElement,
-    contentElement: HTMLElement,
-  ): void {
-    const actionsDiv = document.createElement("div");
-    actionsDiv.className = "message-actions";
-
-    const copyBtn = document.createElement("button");
-    copyBtn.className = "action-chip";
-    copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar';
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(contentElement.innerText);
-      copyBtn.innerHTML = '<i data-feather="check"></i> Copiado';
-      feather.replace();
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar';
-        feather.replace();
-      }, 2000);
-    };
-
-    actionsDiv.appendChild(copyBtn);
-
-    const wrapper = document.createElement("div");
-    wrapper.style.width = "100%";
-    wrapper.appendChild(contentElement.cloneNode(true));
-    wrapper.appendChild(actionsDiv);
-
-    container.replaceChild(wrapper, contentElement);
-  },
-
-  /** Internal: Adds a copy button to all code blocks (<pre> elements) within the content. */
+  /** Internal: Adds a 1-click copy button to all <pre> blocks within contentElement. */
   _applyCodeBlockActions(contentElement: HTMLElement): void {
     const preElements = contentElement.querySelectorAll("pre");
     preElements.forEach((pre) => {
-      // Create wrapper
+      if (pre.parentElement?.classList.contains("code-block-wrapper")) {
+        return;
+      }
+
       const wrapper = document.createElement("div");
       wrapper.className = "code-block-wrapper";
 
-      // Insert wrapper before pre, then move pre into wrapper
       pre.parentNode?.insertBefore(wrapper, pre);
       wrapper.appendChild(pre);
 
-      // Create copy button
       const copyBtn = document.createElement("button");
+      copyBtn.type = "button";
       copyBtn.className = "code-block-copy-btn";
-      copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Código';
+      copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Prompt';
 
       copyBtn.onclick = () => {
-        // Extract text from the code element inside if it exists, otherwise use pre's text
         const codeElement = pre.querySelector("code");
         const textToCopy = codeElement ? codeElement.innerText : pre.innerText;
 
@@ -282,14 +217,12 @@ export const UI = {
         copyBtn.innerHTML = '<i data-feather="check"></i> Copiado';
         feather.replace();
 
-        // Reset after 2 seconds
         setTimeout(() => {
-          copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Código';
+          copyBtn.innerHTML = '<i data-feather="copy"></i> Copiar Prompt';
           feather.replace();
         }, 2000);
       };
 
-      // Append copy button to wrapper
       wrapper.appendChild(copyBtn);
     });
   },

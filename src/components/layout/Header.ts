@@ -77,7 +77,7 @@ export class HeaderComponent {
       ) as HTMLElement;
       if (activeItem) {
         const deleteBtn = activeItem.querySelector(
-          ".action-delete",
+          ".action-trash",
         ) as HTMLButtonElement;
         if (deleteBtn) deleteBtn.click();
       }

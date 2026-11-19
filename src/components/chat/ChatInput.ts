@@ -26,7 +26,6 @@ export class ChatInputComponent {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         if (!this.sendBtn.disabled) {
-          // Native clean way to trigger HTML5 Form sumbission with all validations
           if (typeof this.form.requestSubmit === "function") {
             this.form.requestSubmit();
           } else {
@@ -45,11 +44,21 @@ export class ChatInputComponent {
       const message = this.input.value.trim();
       if (!message) return;
 
-      // Emit event through EventBus
       events.emit(EVENTS.MESSAGE_SENT, message);
-
-      // Reset UI state locally
       this.resetInput();
+    });
+
+    // Populate input from starter suggestion cards or Quality Panel "Refinar Prompt"
+    events.subscribe(EVENTS.NEW_CHAT_REQUESTED, (prompt: string) => {
+      if (typeof prompt === "string" && prompt.trim()) {
+        this.setQuery(prompt);
+      }
+    });
+
+    events.subscribe(EVENTS.REFINE_REQUESTED, (prompt: string) => {
+      if (typeof prompt === "string" && prompt.trim()) {
+        this.setQuery(prompt);
+      }
     });
   }
 
@@ -59,7 +68,6 @@ export class ChatInputComponent {
     this.sendBtn.disabled = true;
   }
 
-  // Exposed API for other components to force input entry
   public setQuery(text: string) {
     this.input.value = text;
     this.input.style.height = "auto";

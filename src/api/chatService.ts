@@ -1,27 +1,112 @@
 import { config } from "../core/config";
 import { StorageManager } from "../core/storage";
 
+export interface QualityMetadata {
+  score: number;
+  feedback: string;
+  needs_refinement?: boolean;
+}
+
+export interface MetaMetadata {
+  mode: "demo" | "byok" | string;
+  model: string;
+  nature?: string;
+  complexity?: string;
+  remaining_quota: number | null;
+}
+
+export interface QuotaStatus {
+  mode: "demo" | "byok" | string;
+  model: string;
+  daily_limit: number;
+  remaining: number | null;
+}
+
+export interface SessionMessage {
+  role: "user" | "model" | string;
+  parts: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface StreamCallbacks {
+  onChunk: (text: string) => void;
+  onMeta?: (meta: MetaMetadata) => void;
+  onQuality?: (quality: QualityMetadata) => void;
+  onError: (errorMsg: string) => void;
+  onFinish: () => void;
+}
+
+function buildAuthHeaders(includeApiKey = false): Record<string, string> {
+  const token = StorageManager.getToken();
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${token}`,
+  };
+  if (includeApiKey) {
+    const apiKey = StorageManager.getApiKey();
+    if (apiKey && apiKey.trim()) {
+      headers["x-google-api-key"] = apiKey.trim();
+    }
+  }
+  return headers;
+}
+
 export const ApiModule = {
+  checkHealth: async (): Promise<boolean> => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/health`, {
+        method: "GET",
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  },
+
+  getQuota: async (): Promise<QuotaStatus> => {
+    const response = await fetch(`${config.apiBaseUrl}/quota`, {
+      method: "GET",
+      headers: buildAuthHeaders(true),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) throw new Error("UNAUTHORIZED");
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  },
+
   sendChatStream: async (
     message: string,
     sessionId: string,
-    onChunk: (text: string) => void,
-    onError: (errorMsg: string) => void,
-    onFinish: () => void,
+    callbacks: StreamCallbacks,
   ) => {
-    const token = StorageManager.getToken();
-    const apiKey = StorageManager.getApiKey();
-
-    // Configura os headers base
+    const { onChunk, onMeta, onQuality, onError, onFinish } = callbacks;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
+      ...buildAuthHeaders(true),
     };
 
-    // Só anexa o header se a chave existir
-    if (apiKey) {
-      headers["x-google-api-key"] = apiKey;
-    }
+    const dispatchEvent = (parsed: any): boolean => {
+      const eventType = parsed.type;
+      if (eventType === "error" || parsed.error) {
+        onError(parsed.content || parsed.error || "Erro interno no motor.");
+        onFinish();
+        return false;
+      }
+      if (eventType === "meta" && parsed.metadata) {
+        onMeta?.(parsed.metadata as MetaMetadata);
+        return true;
+      }
+      if (eventType === "quality" && parsed.metadata) {
+        onQuality?.(parsed.metadata as QualityMetadata);
+        return true;
+      }
+      if (parsed.content) {
+        onChunk(parsed.content);
+      }
+      return true;
+    };
 
     try {
       const response = await fetch(`${config.apiBaseUrl}/chat`, {
@@ -29,7 +114,7 @@ export const ApiModule = {
         headers,
         body: JSON.stringify({
           session_id: sessionId,
-          message: message,
+          message,
         }),
       });
 
@@ -41,7 +126,9 @@ export const ApiModule = {
         try {
           const errData = await response.json();
           if (errData.detail) errMsg = errData.detail;
-        } catch (e) {}
+        } catch {
+          /* ignore non-JSON error body */
+        }
         throw new Error(errMsg);
       }
 
@@ -58,8 +145,8 @@ export const ApiModule = {
           if (buffer.trim()) {
             try {
               const parsed = JSON.parse(buffer);
-              if (parsed.content) onChunk(parsed.content);
-            } catch (e) {
+              if (!dispatchEvent(parsed)) return;
+            } catch {
               /* ignore remainder parsing errors */
             }
           }
@@ -69,26 +156,18 @@ export const ApiModule = {
 
         buffer += decoder.decode(value, { stream: true });
         const parts = buffer.split("\n");
-        buffer = parts.pop() || ""; // Keep the incomplete part in the buffer
+        buffer = parts.pop() || "";
 
         for (const line of parts) {
           if (!line.trim()) continue;
           try {
             const parsed = JSON.parse(line);
-            if (parsed.error) {
-              onError(parsed.error);
-              onFinish();
-              return;
-            }
-            if (parsed.content) {
-              onChunk(parsed.content);
-            }
-          } catch (e) {
+            if (!dispatchEvent(parsed)) return;
+          } catch {
             console.warn(
               "Recovering from corrupted NDJSON chunk in stream...",
               line,
             );
-            // Priority 6 Fix: Non-fatal, stream continues skipping the broken chunk
           }
         }
       }
@@ -106,12 +185,11 @@ export const ApiModule = {
   },
 
   sendFeedback: async (message: string) => {
-    const token = StorageManager.getToken();
     const response = await fetch(`${config.apiBaseUrl}/feedback`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        ...buildAuthHeaders(false),
       },
       body: JSON.stringify({ message }),
     });
@@ -125,12 +203,9 @@ export const ApiModule = {
   },
 
   getSessions: async () => {
-    const token = StorageManager.getToken();
     const response = await fetch(`${config.apiBaseUrl}/sessions`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: buildAuthHeaders(false),
     });
 
     if (!response.ok) {
@@ -139,5 +214,39 @@ export const ApiModule = {
     }
 
     return await response.json();
+  },
+
+  getSessionMessages: async (
+    sessionId: string,
+  ): Promise<{ status: string; session_id: string; messages: SessionMessage[] }> => {
+    const response = await fetch(
+      `${config.apiBaseUrl}/sessions/${encodeURIComponent(sessionId)}/messages`,
+      {
+        method: "GET",
+        headers: buildAuthHeaders(false),
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) throw new Error("UNAUTHORIZED");
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return await response.json();
+  },
+
+  deleteSession: async (sessionId: string): Promise<void> => {
+    const response = await fetch(
+      `${config.apiBaseUrl}/sessions/${encodeURIComponent(sessionId)}`,
+      {
+        method: "DELETE",
+        headers: buildAuthHeaders(false),
+      },
+    );
+
+    if (!response.ok && response.status !== 404) {
+      if (response.status === 401) throw new Error("UNAUTHORIZED");
+      throw new Error(`API Error: ${response.status}`);
+    }
   },
 };
